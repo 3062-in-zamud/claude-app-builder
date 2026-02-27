@@ -1,0 +1,27 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "version": "0.1.0",
+  "description": "{{DESCRIPTION}}",
+  "type": "module",
+  "bin": {
+    "{{PROJECT_NAME}}": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "commander": "^12.x",
+    "inquirer": "^9.x",
+    "chalk": "^5.x",
+    "ora": "^8.x"
+  },
+  "devDependencies": {
+    "typescript": "^5.x",
+    "tsx": "^4.x",
+    "vitest": "^2.x",
+    "@types/node": "^22.x"
+  }
+}

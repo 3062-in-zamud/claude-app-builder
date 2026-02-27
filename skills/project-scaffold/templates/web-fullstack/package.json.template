@@ -1,0 +1,33 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "next": "15.x",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@supabase/supabase-js": "^2.x",
+    "@supabase/ssr": "^0.x"
+  },
+  "devDependencies": {
+    "typescript": "^5.x",
+    "@types/node": "^22.x",
+    "@types/react": "^19.x",
+    "tailwindcss": "^3.x",
+    "eslint": "^8.x",
+    "vitest": "^2.x",
+    "@vitejs/plugin-react": "^4.x",
+    "@playwright/test": "^1.x"
+  }
+}

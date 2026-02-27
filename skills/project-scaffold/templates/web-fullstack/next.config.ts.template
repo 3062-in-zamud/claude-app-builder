@@ -1,0 +1,14 @@
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  // リモート画像を使用する場合はここにドメインを追加
+  images: {
+    remotePatterns: [],
+  },
+  // 本番ビルドの最適化
+  experimental: {
+    typedRoutes: true,
+  },
+}
+
+export default nextConfig
