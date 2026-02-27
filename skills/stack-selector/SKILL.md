@@ -24,6 +24,16 @@ allowed-tools:
 | `web-api` | APIのみ・フロントなし | Hono + Cloudflare Workers |
 | `cli` | コマンドラインツール | Node.js CLI（Commander.js） |
 | `tui` | ターミナルUI | Ink（React for CLI） |
+| `mobile` | モバイルアプリ | React Native + Expo |
+
+**モバイルアプリ（React Native / Expo）**:
+- React Native + Expo
+- 注意: `/app-builder` フルフローは現在 Web アプリのみ対応です
+  モバイルを選択した場合は各フェーズのスキルを手動実行してください
+
+⚠️ モバイルアプリを選択した場合:
+「`/app-builder` は現在 Web アプリのみ自動化対応です。
+各フェーズのスキルを手動で実行してください。」
 
 ### Step 2: デフォルトスタック（web-fullstack）
 

@@ -65,8 +65,12 @@ echo ""
 # ===== 4. ~/.claude/commands/ にコマンド追加 =====
 echo "⚡ コマンドをインストール中..."
 mkdir -p "$CMD_DIR"
-cp "$SOURCE_DIR/commands/app-builder.md" "$CMD_DIR/app-builder.md"
-echo "  ✅ /app-builder コマンド"
+# 全コマンドファイルをコピー
+for cmd_file in "$SOURCE_DIR/commands/"*.md; do
+  cmd_name=$(basename "$cmd_file")
+  cp "$cmd_file" "$CMD_DIR/$cmd_name"
+  echo "  ✅ /${cmd_name%.md} コマンド"
+done
 echo ""
 
 # ===== 5. ~/.claude/CLAUDE.md に注記追加（重複チェック付き） =====
@@ -92,8 +96,12 @@ echo ""
 echo "個別スキル:"
 echo "  /idea-to-spec \"アイデア\"    - 要件定義のみ"
 echo "  /brand-foundation           - ブランディングのみ"
+echo "  /stack-selector             - 技術スタック選定のみ"
+echo "  /visual-designer            - デザインシステムのみ"
+echo "  /market-research            - 競合調査のみ"
 echo "  /security-hardening         - セキュリティチェックのみ"
 echo "  /deploy-setup               - デプロイのみ"
+echo "  ... その他全コマンドは ~/.claude/commands/ を参照"
 echo ""
 echo "更新: bash ~/.claude-app-builder/update.sh"
 echo "削除: bash ~/.claude-app-builder/uninstall.sh"

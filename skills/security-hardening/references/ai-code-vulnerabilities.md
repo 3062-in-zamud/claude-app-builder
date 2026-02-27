@@ -95,5 +95,5 @@ const response = await anthropic.messages.create({
 
 ## CVE 参照
 
-- CVE-2024-xxxxx: Claude Code が生成したコードの IDOR 脆弱性パターン
+- 参照: OWASP LLM Top 10 LLM01 (Prompt Injection) - 特定CVEなし、OWASPを参照
 - OWASP AI Security Top 10: [LLM01 Prompt Injection](https://owasp.org/www-project-top-10-for-large-language-model-applications/)

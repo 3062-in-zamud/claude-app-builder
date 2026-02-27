@@ -81,6 +81,41 @@ export default function RootLayout({ children }) {
 }
 ```
 
+### Google Analytics 4（オプション）
+
+Vercel Analytics との使い分け:
+- **Vercel Analytics**: ページビュー・Core Web Vitals（プロジェクト固有）
+- **Google Analytics 4**: より詳細なユーザー行動・カスタムイベント・クロスドメイン追跡
+
+GA4の基本設定:
+
+1. [Google Analytics](https://analytics.google.com) でプロパティ作成
+2. 測定ID（G-XXXXXXXXXX）を取得
+3. 環境変数に追加:
+   ```
+   NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+   ```
+4. `src/app/layout.tsx` にスクリプト追加:
+   ```typescript
+   // Google Analytics
+   {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+     <>
+       <Script
+         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+         strategy="afterInteractive"
+       />
+       <Script id="google-analytics" strategy="afterInteractive">
+         {`
+           window.dataLayer = window.dataLayer || [];
+           function gtag(){dataLayer.push(arguments);}
+           gtag('js', new Date());
+           gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+         `}
+       </Script>
+     </>
+   )}
+   ```
+
 ### Step 3: Lighthouse CI 設定
 
 ```bash

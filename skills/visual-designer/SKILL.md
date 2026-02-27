@@ -20,7 +20,7 @@ allowed-tools:
 docs/brand-brief.md を読み込む
 ```
 
-### Step 2: デザインシステム策定（Opus で戦略・Sonnet で実装詳細）
+### Step 2: デザインシステム策定
 
 **カラーシステム**:
 - Tailwind カスタムカラー設定（tailwind.config.ts）

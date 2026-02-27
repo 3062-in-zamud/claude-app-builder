@@ -11,7 +11,7 @@
 セキュリティ脆弱性を発見した場合:
 
 1. **公開Issueには報告しないでください**
-2. GitHub の [Security Advisories](https://github.com/[username]/claude-app-builder/security/advisories/new) から非公開で報告してください
+2. GitHub の [Security Advisories](https://github.com/3062-in-zamud/claude-app-builder/security/advisories/new) から非公開で報告してください
 3. 以下の情報を含めてください:
    - 脆弱性の種類
    - 影響を受けるコンポーネント

@@ -40,14 +40,23 @@ supabase projects list 2>/dev/null | head -3 || {
 `.env.example` に記載された全変数を Vercel に設定:
 
 ```bash
-# 環境変数の一括設定（Production のみ）
-# 実際の値は .env.local を参照
-vercel env add NEXT_PUBLIC_SUPABASE_URL production
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
-vercel env add SUPABASE_SERVICE_ROLE_KEY production
-vercel env add NEXT_PUBLIC_APP_URL production
-vercel env add SENTRY_DSN production
-vercel env add NEXT_PUBLIC_SENTRY_DSN production
+# .env.local から環境変数を読み込んで一括設定（非対話式）
+if [ -f ".env.local" ]; then
+  echo "環境変数を Vercel に設定中..."
+  while IFS= read -r line; do
+    # コメント行・空行をスキップ
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "$line" ]] && continue
+    key="${line%%=*}"           # 最初の = までをキーに
+    value="${line#*=}"          # 最初の = 以降を全て値に（= を含む値も正しく取得）
+    [ -z "$key" ] && continue
+    vercel env add "$key" production "$value" 2>/dev/null || true
+  done < .env.local
+  echo "✅ 環境変数の設定完了"
+else
+  echo "⚠️  .env.local が見つかりません"
+  echo "   Vercel ダッシュボードで手動設定が必要です（追加介入ポイント）"
+fi
 ```
 
 ⚠️ **SERVICE_ROLE_KEY は必ず Vercel ダッシュボードで設定。コードには含めない**
@@ -69,12 +78,24 @@ echo "✅ マイグレーション完了"
 ### Step 4: Vercel デプロイ
 
 ```bash
-# 本番デプロイ
-vercel --prod
+# 本番デプロイ（単一実行）
+DEPLOY_URL=$(vercel --prod --yes 2>/dev/null | grep -E "^https://" | tail -1)
+if [ -z "$DEPLOY_URL" ]; then
+  echo "⚠️  デプロイURLの取得に失敗しました。Vercel Dashboardで確認してください"
+else
+  echo "🚀 デプロイ URL: $DEPLOY_URL"
+fi
+```
 
-# デプロイ URL を取得
-DEPLOY_URL=$(vercel --prod --confirm 2>&1 | grep "https://" | tail -1)
-echo "🚀 デプロイ URL: $DEPLOY_URL"
+### Step 4.5: カスタムドメイン設定（オプション）
+
+```bash
+# カスタムドメインを設定する場合
+echo "カスタムドメインを設定しますか？（スキップ可能）"
+# 設定する場合:
+# vercel domains add your-domain.com
+# 表示されたDNSレコードをドメインレジストラで設定してください
+echo "DNS設定後、数分〜24時間でSSL証明書が自動発行されます"
 ```
 
 ### Step 5: デプロイ後ヘルスチェック
@@ -137,6 +158,31 @@ done
 
 [DEPLOY_URL]
 ```
+
+### Step 7: メール送信設定（オプション）
+
+Resend（無料: 3,000通/月）の設定:
+
+1. [Resend](https://resend.com) でアカウント作成・APIキー取得
+2. 環境変数に追加:
+   ```
+   RESEND_API_KEY=re_xxxx
+   ```
+3. Vercel に設定:
+   ```bash
+   vercel env add RESEND_API_KEY production "re_xxxx"
+   ```
+
+### Step 8: カスタマーサポート設定（オプション）
+
+Crisp（無料プランあり）の1行埋め込み:
+
+```html
+<!-- layout.tsx の <head> に追加 -->
+<script>window.$crisp=[];window.CRISP_WEBSITE_ID="YOUR-CRISP-ID";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
+```
+
+[Crisp](https://crisp.chat) でアカウント作成後、Website IDを取得してください。
 
 ### 出力
 

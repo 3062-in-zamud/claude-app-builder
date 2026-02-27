@@ -34,10 +34,10 @@ npx create-next-app@latest [プロジェクト名] \
   --eslint \
   --app \
   --src-dir \
-  --import-alias "@/*"
+  --import-alias "@/*" --yes
 
 # shadcn/ui インストール
-cd [プロジェクト名] && npx shadcn@latest init
+cd [プロジェクト名] && npx shadcn@latest init --yes --defaults
 
 # Supabase クライアントインストール
 npm install @supabase/supabase-js @supabase/ssr
@@ -51,6 +51,14 @@ npm install -D vitest @vitejs/plugin-react @playwright/test
 - `.gitignore`（.env* を含む）
 - `.env.example`（全環境変数のキー・説明を記載、値なし）
 - `README.md`（基本的な内容、documentation-suite で上書き）
+- `src/app/api/health/route.ts`（ヘルスチェックエンドポイント）
+
+**生成ファイル**: `src/app/api/health/route.ts`
+```typescript
+export async function GET() {
+  return Response.json({ status: 'ok', timestamp: new Date().toISOString() })
+}
+```
 
 ### Step 4: GitHub リポジトリ作成
 

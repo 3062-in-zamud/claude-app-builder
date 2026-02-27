@@ -1,7 +1,7 @@
 ---
 name: release-checklist
 description: |
-  What: リリース前の34項目チェックリストを実行する
+  What: リリース前の36項目チェックリストを実行する
   When: Phase 6（monitoring-setup 後、deploy-setup 前）
   How: 全項目を順次確認 → 未完了項目を修正 → 全 ✅ でリリース許可
 model: claude-sonnet-4-6
@@ -11,11 +11,11 @@ allowed-tools:
   - Bash
 ---
 
-# release-checklist: リリース前34項目チェック
+# release-checklist: リリース前36項目チェック
 
 ## チェックリスト実行手順
 
-`references/checklist-34items.md` の全34項目を以下の手順で確認:
+`references/checklist-36items.md` の全36項目を以下の手順で確認:
 
 1. 各項目を順番に確認
 2. ✅（問題なし）/ ❌（要修正）/ ⏭️（スキップ）をマーク

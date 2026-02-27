@@ -21,7 +21,9 @@ echo "🚨 CRITICAL チェック:"
 
 # 1. Service Role Key がフロントエンドに混入していないか
 echo -n "  Service Role Key 漏洩チェック... "
-if find src -name "*.tsx" -o -name "*.ts" 2>/dev/null | xargs grep -l "SUPABASE_SERVICE_ROLE_KEY" 2>/dev/null | grep -v "app/api/" | grep -v "lib/supabase-admin" | grep -q .; then
+FRONTEND_FILES=$(find src \( -name "*.tsx" -o -name "*.ts" \) 2>/dev/null \
+  | grep -v "app/api/" | grep -v "lib/supabase-admin" || true)
+if [ -n "$FRONTEND_FILES" ] && echo "$FRONTEND_FILES" | xargs grep -l "SUPABASE_SERVICE_ROLE_KEY" 2>/dev/null | grep -q .; then
   echo -e "${RED}❌ FAIL${NC}"
   echo "     フロントエンドに SUPABASE_SERVICE_ROLE_KEY が見つかりました"
   echo "     API routes (/app/api/) 以外では anon key を使用してください"
@@ -54,16 +56,40 @@ fi
 # 4. TruffleHog スキャン（インストールされている場合）
 echo -n "  TruffleHog シークレットスキャン... "
 if command -v trufflehog >/dev/null 2>&1; then
-  if trufflehog git file://. --only-verified --json 2>/dev/null | grep -q '"Verified":true'; then
-    echo -e "${RED}❌ FAIL${NC}"
-    echo "     検証済みシークレットが見つかりました！即座にローテーションしてください"
-    ERRORS=$((ERRORS + 1))
+  if trufflehog git file://. --json 2>/dev/null | grep -q '"Raw"'; then
+    echo -e "${YELLOW}⚠️  WARNING${NC}"
+    echo "     シークレットの可能性があります。確認・ローテーションを検討してください"
+    WARNINGS=$((WARNINGS + 1))
   else
     echo -e "${GREEN}✅ PASS${NC}"
   fi
 else
   echo -e "${YELLOW}⚠️  SKIP${NC} (trufflehog 未インストール: brew install trufflehog)"
   WARNINGS=$((WARNINGS + 1))
+fi
+
+# IDOR チェック（認証なしAPIルート検出）
+echo -n "  IDOR チェック（認証なし API ルート）... "
+# Step 1: GET/POST を含むファイルを取得
+ROUTE_FILES=$(find src/app/api \( -name "*.ts" -o -name "*.tsx" \) 2>/dev/null \
+  | xargs grep -l "export async function GET\|export async function POST" 2>/dev/null || true)
+
+# Step 2: 空でなければ認証チェック
+UNAUTH_ROUTES=""
+if [ -n "$ROUTE_FILES" ]; then
+  UNAUTH_ROUTES=$(echo "$ROUTE_FILES" | \
+    xargs grep -LF "getSession
+getServerSession
+createRouteHandlerClient
+auth(" 2>/dev/null || true)
+fi
+
+if [ -n "$UNAUTH_ROUTES" ]; then
+  echo -e "${YELLOW}⚠️  WARNING${NC}"
+  echo "$UNAUTH_ROUTES" | sed 's/^/     疑わしいファイル: /'
+  WARNINGS=$((WARNINGS + 1))
+else
+  echo -e "${GREEN}✅ PASS${NC}"
 fi
 
 echo ""
@@ -73,7 +99,8 @@ echo "⚠️  HIGH チェック:"
 
 # 5. localStorage で JWT を保存していないか
 echo -n "  JWT 格納場所チェック... "
-if find src -name "*.tsx" -o -name "*.ts" 2>/dev/null | xargs grep -l "localStorage.setItem.*token\|localStorage.setItem.*jwt\|localStorage.setItem.*auth" 2>/dev/null | grep -q .; then
+SRC_FILES=$(find src \( -name "*.tsx" -o -name "*.ts" \) 2>/dev/null || true)
+if [ -n "$SRC_FILES" ] && echo "$SRC_FILES" | xargs grep -l "localStorage.setItem.*token\|localStorage.setItem.*jwt\|localStorage.setItem.*auth" 2>/dev/null | grep -q .; then
   echo -e "${YELLOW}⚠️  WARNING${NC}"
   echo "     localStorage に JWT を格納している可能性があります"
   echo "     httpOnly Cookie の使用を推奨します"

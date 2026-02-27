@@ -1,9 +1,13 @@
 {
   "name": "claude-app-builder",
-  "description": "Zero to MVP in one command. Orchestrates 14 skills across 8 phases — spec, branding, stack selection, scaffolding, TDD implementation, AI-specific security hardening, monitoring, and Vercel+Supabase deployment.",
+  "description": "Zero to MVP in one command. Orchestrates skills across 8 phases — spec, branding, stack selection, scaffolding, TDD implementation, AI-specific security hardening, monitoring, and Vercel+Supabase deployment.",
   "version": "1.0.0",
   "author": {
     "name": "3062-in-zamud",
     "url": "https://github.com/3062-in-zamud"
-  }
+  },
+  "homepage": "https://github.com/3062-in-zamud/claude-app-builder",
+  "repository": "https://github.com/3062-in-zamud/claude-app-builder",
+  "license": "MIT",
+  "keywords": ["app-builder", "mvp", "scaffold", "deployment", "vercel", "supabase", "nextjs", "tdd", "security"]
 }

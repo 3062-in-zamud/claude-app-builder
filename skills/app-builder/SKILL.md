@@ -18,12 +18,15 @@ allowed-tools:
 
 ## 概要
 
-アイデアから MVP リリースまで、以下の8フェーズを自動実行します。
+アイデアから MVP リリースまで、以下のフェーズを自動実行します。
 
-**ユーザー介入ポイント（全3回）**:
+**ユーザー介入ポイント**:
 1. アイデア入力（起動時）
-2. **Phase 1後の要件定義承認**（必須・1回のみ）
-3. デプロイ後の本番確認（オプション）
+2. 競合サービス名の入力（Phase 0.5）
+3. **Phase 1後の要件定義承認**（必須・承認ゲート1）
+4. Vercel/Supabase 制限事項の確認（Phase 1内）
+5. `.env.local` への環境変数値の入力（Phase 7前）
+6. デプロイ後の本番確認（承認ゲート2）
 
 ## 起動前チェック
 
@@ -44,6 +47,14 @@ supabase projects list 2>/dev/null || {
 ```
 
 ## フェーズ実行ワークフロー
+
+### Phase 0.5: 市場調査（オプション推奨）
+
+**実行スキル**:
+- `market-research` [Sonnet] → `docs/market-research.md`
+
+競合調査と市場規模の概算を行います。idea-to-spec 前に実行することで、
+より精度の高い要件定義が可能になります。
 
 ### Phase 1: 要件定義 + ブランディング基礎
 
@@ -69,27 +80,30 @@ supabase projects list 2>/dev/null || {
 
 **実行スキル（並列）**:
 - `stack-selector` [Sonnet] → `docs/tech-stack.md`
-- `visual-designer` [Opus→Sonnet] → `docs/design-system.md`
+- `visual-designer` [Opus] → `docs/design-system.md`
 
-### Phase 3: ドキュメント + LP + 法務
+### Phase 3: ドキュメント + LP + 法務 + SEO
 
 **実行スキル（並列）**:
 - `documentation-suite` [Sonnet] → `README.md` + `docs/`
 - `landing-page-builder` [Sonnet] → `app/landing/`
 - `legal-docs-generator` [Haiku] → `app/privacy/` + `app/terms/`
+- `seo-setup` [Sonnet] → `src/app/sitemap.ts` + `robots.ts` + JSON-LD
 
 ### Phase 4: リポジトリ準備
 
 **実行スキル（順次）**:
 1. `project-scaffold` [Haiku] → リポジトリ作成 + テンプレート展開
-2. `github-repo-setup` [Haiku+Sonnet] → 公開設定 + Branch Protection + RLS初期設定
+2. `ci-setup` [Sonnet] → `.github/workflows/test.yml` 生成（ジョブ名: "test"）
+3. `github-repo-setup` [Haiku+Sonnet] → 公開設定 + Branch Protection（contexts: ["test"]）+ Dependabot
 
 ### Phase 5: 実装 + テスト
 
-**チーム編成**:
-- `chloe` [Sonnet] - TDD 実装
-- `testaro` [Sonnet] - テスト実装・80%カバレッジ確認
-- `codex-review` → 品質ゲート（ok:true まで反復）
+**実行スキル（順次）**:
+1. `implementation` [Sonnet] → TDD実装・Vitest単体テスト・Playwright E2E
+   - 完了条件: `npm run test:coverage` 80%以上 + TypeScript型エラーなし
+
+※ 単一コンテキストで一貫性のある実装を行います。
 
 ### Phase 5.5: セキュリティ強化（必須・スキップ不可）
 
@@ -102,14 +116,18 @@ supabase projects list 2>/dev/null || {
 
 **実行スキル（並列）**:
 - `monitoring-setup` [Sonnet] → Sentry + Analytics + Lighthouse CI
-- `release-checklist` [Sonnet] → 34項目チェック
+- `release-checklist` [Sonnet] → 36項目チェック
 
 ### Phase 7: デプロイ実行 + ローンチ準備
 
 **実行スキル**:
 - `deploy-setup` [Haiku→Sonnet] → supabase db push → vercel --prod → ローンチ素材生成
 
-### Phase 8: リリース報告（Opus が最終確認）
+### Phase 8: リリース報告 + フィードバック設計
+
+**実行内容**:
+1. リリース報告（本番URL + セキュリティ確認済みマーク）
+2. `feedback-loop` [Sonnet] → フィードバック収集設計 + 次イテレーション計画
 
 ```
 🎉 アプリケーションが公開されました！
@@ -128,10 +146,10 @@ supabase projects list 2>/dev/null || {
   [Twitter/X 告知文]
   [LinkedIn 告知文]
 
-📊 次のステップ:
+📋 次のステップ:
+  - Typeform/Canny でフィードバック収集を設定（docs/feedback-strategy.md 参照）
   - Sentry でエラーを監視
-  - Vercel Analytics でユーザー行動を確認
-  - ユーザーフィードバックを収集
+  - 2週間後: ユーザーフィードバックを元に次イテレーション計画
 ```
 
 ## エラーハンドリング

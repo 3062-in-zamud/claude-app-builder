@@ -31,7 +31,7 @@ gh api \
   --field required_pull_request_reviews='{"required_approving_review_count":1}' \
   --field enforce_admins=false \
   --field restrictions=null \
-  --field required_status_checks='{"strict":true,"contexts":["ci/tests"]}'
+  --field required_status_checks='{"strict":true,"contexts":["test"]}'
 ```
 
 ### Step 3: Dependabot 有効化
