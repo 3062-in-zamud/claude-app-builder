@@ -34,8 +34,11 @@ done
 # コマンド更新
 echo ""
 echo "⚡ コマンドを更新中..."
-cp "$LOCAL_DIR/commands/app-builder.md" "$CMD_DIR/app-builder.md"
-echo "  ✅ /app-builder コマンド"
+for cmd_file in "$LOCAL_DIR/commands/"*.md; do
+  cmd_name=$(basename "$cmd_file")
+  cp "$cmd_file" "$CMD_DIR/$cmd_name"
+  echo "  ✅ /${cmd_name%.md} コマンド"
+done
 
 echo ""
 echo "✅ 更新完了！"

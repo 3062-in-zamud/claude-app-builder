@@ -39,6 +39,10 @@ supabase projects list 2>/dev/null | head -3 || {
 
 `.env.example` に記載された全変数を Vercel に設定:
 
+> **注意**: 値に `=` が複数含まれる場合（例: base64エンコードされたキー）も
+> 正しく処理します（`key="${line%%=*}"` / `value="${line#*=}"` を使用）。
+> ただし改行を含む値は非対応。その場合は Vercel Dashboard で手動設定してください。
+
 ```bash
 # .env.local から環境変数を読み込んで一括設定（非対話式）
 if [ -f ".env.local" ]; then
@@ -50,7 +54,9 @@ if [ -f ".env.local" ]; then
     key="${line%%=*}"           # 最初の = までをキーに
     value="${line#*=}"          # 最初の = 以降を全て値に（= を含む値も正しく取得）
     [ -z "$key" ] && continue
-    vercel env add "$key" production "$value" 2>/dev/null || true
+    printf '%s' "$value" | vercel env add "$key" production 2>/dev/null || {
+      echo "  ⚠️  $key の設定に失敗しました。Vercel Dashboard で手動設定してください"
+    }
   done < .env.local
   echo "✅ 環境変数の設定完了"
 else

@@ -4,7 +4,7 @@ description: |
   What: プライバシーポリシーと利用規約のテンプレートを生成する
   When: Phase 3（LP 生成後）
   How: requirements.md の情報を元にカスタマイズされたテンプレートを生成
-model: claude-haiku-4-5-20251001
+model: claude-sonnet-4-6
 allowed-tools:
   - Read
   - Write

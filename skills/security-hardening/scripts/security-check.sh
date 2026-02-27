@@ -85,9 +85,12 @@ auth(" 2>/dev/null || true)
 fi
 
 if [ -n "$UNAUTH_ROUTES" ]; then
-  echo -e "${YELLOW}⚠️  WARNING${NC}"
+  echo -e "${RED}❌ CRITICAL（要手動確認）${NC}"
+  echo "     認証なしAPIルートの疑いがあります:"
   echo "$UNAUTH_ROUTES" | sed 's/^/     疑わしいファイル: /'
-  WARNINGS=$((WARNINGS + 1))
+  echo "     ※ 静的解析の限界のため、所有者確認（user_id === resource.owner_id）を"
+  echo "       手動でコードレビューしてから Phase 6 に進んでください"
+  ERRORS=$((ERRORS + 1))
 else
   echo -e "${GREEN}✅ PASS${NC}"
 fi
@@ -126,10 +129,20 @@ fi
 # 7. npm audit
 echo -n "  npm audit (HIGH 以上)... "
 if [ -f "package.json" ]; then
-  AUDIT_RESULT=$(npm audit --audit-level=high 2>&1 || true)
-  if echo "$AUDIT_RESULT" | grep -q "found [1-9]"; then
+  AUDIT_JSON=$(npm audit --json 2>/dev/null || echo '{}')
+  HIGH_COUNT=$(echo "$AUDIT_JSON" | \
+    python3 -c "
+import sys, json
+try:
+  d = json.load(sys.stdin)
+  v = d.get('metadata', {}).get('vulnerabilities', {})
+  print(v.get('high', 0) + v.get('critical', 0))
+except:
+  print(0)
+" 2>/dev/null || echo 0)
+  if [ "$HIGH_COUNT" -gt 0 ] 2>/dev/null; then
     echo -e "${YELLOW}⚠️  WARNING${NC}"
-    echo "     HIGH 以上の脆弱性があります: npm audit --audit-level=high で確認"
+    echo "     HIGH/CRITICAL 脆弱性が $HIGH_COUNT 件あります: npm audit で確認"
     WARNINGS=$((WARNINGS + 1))
   else
     echo -e "${GREEN}✅ PASS${NC}"

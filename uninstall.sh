@@ -18,6 +18,7 @@ SKILLS=(
   legal-docs-generator project-scaffold github-repo-setup
   security-hardening monitoring-setup release-checklist deploy-setup
   market-research implementation ci-setup seo-setup feedback-loop
+  user-research analytics-events
 )
 
 echo "📦 スキルを削除中..."

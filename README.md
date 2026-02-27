@@ -64,15 +64,13 @@ claude plugin install claude-app-builder
 /app-builder "フリーランサー向け請求書管理ツール"
 ```
 
-**承認ゲートは2回のみ**（要件定義後・デプロイ後）
-
-その他の入力:
+**ユーザー介入ポイント（全6回）:**
 1. アイデア入力（起動時）
-2. 競合サービス名の入力（Phase 0.5）
-3. 要件定義・ブランディングの承認 ← **承認ゲート1**
-4. Vercel/Supabase 制限事項の確認（Phase 1内）
-5. `.env.local` への環境変数値の入力（Phase 7前）
-6. 本番確認 ← **承認ゲート2**
+2. 競合サービス名の入力（Phase 0.5、スキップ可能）
+3. **要件定義・ブランディングの承認**（承認ゲート1）← 修正要望を伝えられます
+4. Vercel/Supabase 無料プラン制限事項の確認（Phase 1内）
+5. `.env.local` への API キー入力（Phase 7前）
+6. **本番URL動作確認**（承認ゲート2）
 
 ### 個別スキルを直接呼び出す
 
@@ -87,13 +85,14 @@ claude plugin install claude-app-builder
 ## ワークフロー
 
 ```
+Phase 0:   ユーザーリサーチ (user-research) ← 推奨
 Phase 0.5: 市場調査 (market-research) ← 推奨
-Phase 1:   要件定義 (idea-to-spec) + ブランディング (brand-foundation)
+Phase 1:   要件定義 (idea-to-spec) → ブランディング (brand-foundation) ← 順次
            ↓ ユーザー承認ゲート1
 Phase 2:   技術スタック選定 (stack-selector) + デザインシステム (visual-designer)
-Phase 3:   ドキュメント + LP + 法務 + SEO
-Phase 4:   GitHub リポジトリ準備 + CI設定
-Phase 5:   TDD 実装 + テスト
+Phase 3:   GitHub リポジトリ準備 + CI設定 (project-scaffold, ci-setup, github-repo-setup)
+Phase 4:   ドキュメント + LP + 法務 + SEO
+Phase 5:   TDD 実装 + テスト + 計測イベント (analytics-events)
 Phase 5.5: AI生成コードセキュリティ強化 ← Opus が担当
 Phase 6:   Sentry + Lighthouse CI + 36項目チェックリスト
 Phase 7:   Vercel + Supabase デプロイ + ローンチ素材生成
@@ -105,19 +104,21 @@ Phase 8:   リリース報告 + フィードバック設計
 | スキル | Phase | モデル | 役割 |
 |--------|-------|--------|------|
 | `app-builder` | 全体 | **Opus** | オーケストレーター |
+| `user-research` | 0 | Sonnet | ペルソナ・インタビューガイド・仮説検証 |
 | `market-research` | 0.5 | Sonnet | 競合調査・市場分析 |
 | `idea-to-spec` | 1 | Sonnet | アイデア→requirements.md |
 | `brand-foundation` | 1 | **Opus** | ブランド戦略 |
 | `stack-selector` | 2 | Sonnet | 技術スタック選定 |
 | `visual-designer` | 2 | **Opus** | デザインシステム（WCAG AA） |
-| `documentation-suite` | 3 | Sonnet | README + ARCHITECTURE |
-| `landing-page-builder` | 3 | Sonnet | LP + OGP + メタタグ |
-| `legal-docs-generator` | 3 | Haiku | プライバシー・利用規約 |
-| `seo-setup` | 3 | Sonnet | サイトマップ・robots.txt・JSON-LD |
-| `project-scaffold` | 4 | Haiku | Next.js / CLI テンプレート展開 |
-| `github-repo-setup` | 4 | Sonnet | Branch Protection + Dependabot |
-| `ci-setup` | 4 | Sonnet | GitHub Actions CI設定 |
+| `documentation-suite` | 4 | Sonnet | README + ARCHITECTURE |
+| `landing-page-builder` | 4 | Sonnet | LP + OGP + メタタグ |
+| `legal-docs-generator` | 4 | Sonnet | プライバシー・利用規約 |
+| `seo-setup` | 4 | Sonnet | サイトマップ・robots.txt・JSON-LD |
+| `project-scaffold` | 3 | Haiku | Next.js / CLI テンプレート展開 |
+| `github-repo-setup` | 3 | Sonnet | Branch Protection + Dependabot |
+| `ci-setup` | 3 | Sonnet | GitHub Actions CI設定 |
 | `implementation` | 5 | Sonnet | TDD実装・テスト |
+| `analytics-events` | 5 | Sonnet | 計測イベント設計・Vercel Analytics実装 |
 | `security-hardening` | 5.5 | **Opus** | IDOR / RLS / シークレット自動スキャン |
 | `monitoring-setup` | 6 | Sonnet | Sentry + Vercel Analytics + Lighthouse CI |
 | `release-checklist` | 6 | Sonnet | 全項目チェック（CRITICAL明記） |

@@ -48,6 +48,14 @@ supabase projects list 2>/dev/null || {
 
 ## フェーズ実行ワークフロー
 
+### Phase 0: ユーザーリサーチ（推奨・任意）
+
+**実行スキル**:
+- `user-research` [Sonnet] → `docs/personas.md` + `docs/interview-guide.md` + `docs/hypothesis.md`
+
+「自分が欲しいから作る」罠を回避するためのペルソナ・インタビューガイド・仮説検証フレームを生成します。
+実際のユーザーインタビュー（3〜5名）を実施してから Phase 0.5 へ進むことを推奨します。
+
 ### Phase 0.5: 市場調査（オプション推奨）
 
 **実行スキル**:
@@ -58,9 +66,12 @@ supabase projects list 2>/dev/null || {
 
 ### Phase 1: 要件定義 + ブランディング基礎
 
-**実行スキル（並列）**:
-- `idea-to-spec` [Sonnet] → `docs/requirements.md`
-- `brand-foundation` [Opus] → `docs/brand-brief.md`
+**実行スキル（順次）**:
+1. `idea-to-spec` [Sonnet] → `docs/requirements.md`（完了を確認してから次へ）
+2. `brand-foundation` [Opus] → `docs/brand-brief.md`（requirements.md を読み込んで実行）
+
+※ 並列化でなく順次実行にすることで、brand-foundation が正しく requirements.md を
+  参照できることを保証する。
 
 **完了後: ユーザー承認ゲート**
 
@@ -82,20 +93,20 @@ supabase projects list 2>/dev/null || {
 - `stack-selector` [Sonnet] → `docs/tech-stack.md`
 - `visual-designer` [Opus] → `docs/design-system.md`
 
-### Phase 3: ドキュメント + LP + 法務 + SEO
-
-**実行スキル（並列）**:
-- `documentation-suite` [Sonnet] → `README.md` + `docs/`
-- `landing-page-builder` [Sonnet] → `app/landing/`
-- `legal-docs-generator` [Haiku] → `app/privacy/` + `app/terms/`
-- `seo-setup` [Sonnet] → `src/app/sitemap.ts` + `robots.ts` + JSON-LD
-
-### Phase 4: リポジトリ準備
+### Phase 3: リポジトリ準備
 
 **実行スキル（順次）**:
 1. `project-scaffold` [Haiku] → リポジトリ作成 + テンプレート展開
 2. `ci-setup` [Sonnet] → `.github/workflows/test.yml` 生成（ジョブ名: "test"）
 3. `github-repo-setup` [Haiku+Sonnet] → 公開設定 + Branch Protection（contexts: ["test"]）+ Dependabot
+
+### Phase 4: ドキュメント + LP + 法務 + SEO
+
+**実行スキル（並列）**:
+- `documentation-suite` [Sonnet] → `README.md` + `docs/`
+- `landing-page-builder` [Sonnet] → `app/landing/`
+- `legal-docs-generator` [Sonnet] → `app/privacy/` + `app/terms/`（※モデル変更はB1で対応）
+- `seo-setup` [Sonnet] → `src/app/sitemap.ts` + `robots.ts` + JSON-LD
 
 ### Phase 5: 実装 + テスト
 
@@ -181,4 +192,5 @@ supabase projects list 2>/dev/null || {
 | デザイン戦略 | `claude-opus-4-6` |
 | セキュリティレビュー | `claude-opus-4-6` |
 | 要件定義・実装・ドキュメント | `claude-sonnet-4-6` |
-| テンプレート展開・法務文書 | `claude-haiku-4-5-20251001` |
+| テンプレート展開 | `claude-haiku-4-5-20251001` |
+| 法務文書 | `claude-sonnet-4-6` |

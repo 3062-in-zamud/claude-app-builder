@@ -39,6 +39,12 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm run lint
       - run: npm test -- --coverage
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E tests
+        run: npx playwright test
+        env:
+          CI: true
 ```
 
 ### Step 2: package.json のスクリプト確認
