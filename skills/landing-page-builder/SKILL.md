@@ -20,7 +20,10 @@ allowed-tools:
 docs/requirements.md
 docs/brand-brief.md
 docs/design-system.md（存在する場合）
+docs/personas.md（存在する場合のみ。存在しない場合は上記ファイルの情報のみで進行する）
 ```
+
+**ペルソナ活用ルール**: コピーライティングのトーンは `brand-brief.md` のブランドボイスが**最優先**。ペルソナは具体的な言葉遣い・価値観のニュアンス（例: 「時短」を強調するか「品質」を強調するか）に活用し、ブランドボイスと矛盾させない。
 
 ### Step 2: LP コンポーネント生成
 

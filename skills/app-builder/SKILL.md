@@ -66,6 +66,8 @@ supabase projects list 2>/dev/null || {
 
 ### Phase 1: 要件定義 + ブランディング基礎
 
+※ `docs/personas.md` が存在しない場合: 「ペルソナ情報がないため、汎用的なブランディングになります。先に /user-research を実行しますか？」とユーザーに案内する。
+
 **実行スキル（順次）**:
 1. `idea-to-spec` [Sonnet] → `docs/requirements.md`（完了を確認してから次へ）
 2. `brand-foundation` [Opus] → `docs/brand-brief.md`（requirements.md を読み込んで実行）

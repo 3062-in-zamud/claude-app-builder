@@ -9,6 +9,7 @@ allowed-tools:
   - Read
   - Write
   - WebFetch
+  - WebSearch
   - AskUserQuestion
 ---
 
@@ -46,6 +47,15 @@ allowed-tools:
 
 注意: Product Hunt・App Store は SPA のため WebFetch では取得困難。
 ユーザーのヒアリング回答に基づいて分析を進める。
+
+### Step 1.5: トレンドスキャン（WebSearch）
+
+`references/search-strategy.md` の4カテゴリに従い、WebSearch で市場トレンドを調査する。
+
+- 各カテゴリにつき英語・日本語で検索を実行
+- `{current_year}` は実行時の西暦に置換する
+- WebSearch の `allowed_domains` パラメータを活用し、信頼性の高いソースを優先する（`site:` 構文ではなくツールのパラメータを使う）
+- 検索結果は Step 3（差別化分析）に反映する
 
 ### Step 2: 競合サービス分析
 
