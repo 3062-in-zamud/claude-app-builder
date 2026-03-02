@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-app-builder",
+  "description": "Zero to MVP in one command. 21 skills for full-stack app automation.",
+  "metadata": {
+    "description": "Zero to MVP in one command. 21 skills for full-stack app automation."
+  },
+  "owner": {
+    "name": "3062-in-zamud",
+    "email": "https://github.com/3062-in-zamud"
+  },
+  "plugins": [
+    {
+      "name": "claude-app-builder",
+      "description": "Zero to MVP in one command. Orchestrates 21 skills across 8 phases — spec, branding, stack selection, scaffolding, TDD implementation, AI-specific security hardening, monitoring, and Vercel+Supabase deployment.",
+      "version": "2.1.0",
+      "author": { "name": "3062-in-zamud" },
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/3062-in-zamud/claude-app-builder"
+    }
+  ]
+}

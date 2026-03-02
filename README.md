@@ -34,14 +34,18 @@ bash ~/.claude-app-builder/install.sh
 | Vercel Hobby | **commercial use 禁止** | Pro ($20/月) |
 | Supabase Free | 500MB DB・2PJ・7日非アクティブで一時停止 | Pro ($25/月) |
 
-### 方法2: Claude Code プラグインシステム
-
-> **注意**: Claude Code のプラグインシステムはマーケットプレイスへの登録が必要です。
-> 現時点では公式マーケットプレイスへの申請中のため、`install.sh` をご利用ください。
+### 方法2: Claude Code プラグインシステム（推奨）
 
 ```bash
-claude plugin install claude-app-builder
+# マーケットプレイスを追加（初回のみ）
+claude plugin marketplace add 3062-in-zamud/claude-app-builder
+
+# プラグインをインストール
+claude plugin install claude-app-builder@claude-app-builder
 ```
+
+> **注記**: 公式マーケットプレイスへの申請は審査中です（2025/2/27〜）。
+> 上記コマンドは GitHub リポジトリを自前マーケットプレイスとして利用します。
 
 ### 前提ツール
 
