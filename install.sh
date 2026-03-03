@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude App Builder - インストールスクリプト
+# Claude App Builder v3.0 - インストールスクリプト
 # Usage: curl -fsSL https://raw.githubusercontent.com/3062-in-zamud/claude-app-builder/main/install.sh | bash
 # または: bash install.sh
 
@@ -12,7 +12,7 @@ LOCAL_DIR="$HOME/.claude-app-builder"
 REPO_URL="https://github.com/3062-in-zamud/claude-app-builder"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🚀 Claude App Builder インストール開始"
+echo "🚀 Claude App Builder v3.0 インストール開始"
 echo ""
 
 # ===== 1. 前提ツール確認 =====
@@ -80,7 +80,7 @@ if [ -f "$CLAUDE_MD" ] && ! grep -q "claude-app-builder" "$CLAUDE_MD" 2>/dev/nul
 
 ---
 # claude-app-builder Plugin
-# 0→MVPリリース自動化スキル。/app-builder で起動。
+# 0→MVP→MRR $50Kまで全自動化スキル。/app-builder で起動、/growth-engine で成長フェーズ。
 # 詳細: ~/.claude-app-builder/README.md または ~/.claude/skills/app-builder/SKILL.md
 EOF
   echo "📝 ~/.claude/CLAUDE.md を更新しました"
@@ -88,20 +88,36 @@ fi
 
 echo ""
 echo "═══════════════════════════════════"
-echo "✅ インストール完了！"
+echo "✅ Claude App Builder v3.0 インストール完了！"
 echo ""
 echo "使い方:"
-echo "  /app-builder \"あなたのアイデア\""
+echo "  /app-builder \"あなたのアイデア\"  - 0→MVPリリース（Stage A〜C）"
+echo "  /growth-engine                   - MVP→MRR成長（Stage D〜F）"
 echo ""
-echo "個別スキル:"
-echo "  /idea-to-spec \"アイデア\"    - 要件定義のみ"
-echo "  /brand-foundation           - ブランディングのみ"
-echo "  /stack-selector             - 技術スタック選定のみ"
-echo "  /visual-designer            - デザインシステムのみ"
-echo "  /market-research            - 競合調査のみ"
-echo "  /security-hardening         - セキュリティチェックのみ"
-echo "  /deploy-setup               - デプロイのみ"
-echo "  ... その他全コマンドは ~/.claude/commands/ を参照"
+echo "個別スキル（Stage A〜C: 0→MVP）:"
+echo "  /idea-to-spec \"アイデア\"    - 要件定義"
+echo "  /brand-foundation           - ブランディング"
+echo "  /stack-selector             - 技術スタック選定"
+echo "  /visual-designer            - デザインシステム"
+echo "  /market-research            - 競合調査"
+echo "  /security-hardening         - セキュリティチェック"
+echo "  /deploy-setup               - デプロイ"
+echo ""
+echo "個別スキル（Stage D〜F: MVP→MRR成長）:"
+echo "  /pricing-strategy           - 価格戦略"
+echo "  /payment-integration        - Stripe決済統合"
+echo "  /onboarding-optimizer       - オンボーディング最適化"
+echo "  /email-strategy             - メールマーケティング"
+echo "  /ab-testing                 - A/Bテスト"
+echo "  /conversion-funnel          - コンバージョンファネル"
+echo "  /gdpr-compliance            - GDPR準拠"
+echo "  /data-deletion              - データ削除パイプライン"
+echo "  /retention-strategy         - リテンション戦略"
+echo "  /incident-response          - インシデント対応"
+echo "  /scaling-strategy           - スケーリング戦略"
+echo "  /cost-optimization          - コスト最適化"
+echo ""
+echo "  ... 全コマンドは ~/.claude/commands/ を参照"
 echo ""
 echo "更新: bash ~/.claude-app-builder/update.sh"
 echo "削除: bash ~/.claude-app-builder/uninstall.sh"

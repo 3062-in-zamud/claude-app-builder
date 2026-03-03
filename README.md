@@ -1,6 +1,6 @@
 # Claude App Builder
 
-> アイデアを入力するだけで **0 → MVP 世界公開**まで全自動化する Claude Code プラグイン
+> アイデアを入力するだけで **0 → MVP → MRR $50K まで全自動化**する Claude Code プラグイン
 
 > **注意**: プログラミングの基礎知識（コードレビュー・デバッグ）を前提とします
 
@@ -56,9 +56,48 @@ claude plugin install claude-app-builder@claude-app-builder
 | [supabase](https://supabase.com/docs/reference/cli) | DB管理 | `npm install -g supabase` |
 | Node.js 18+ | 実行環境 | [nodejs.org](https://nodejs.org/) |
 
+## パイプライン概要（6ステージ・5ゲート）
+
+```
+=== Stage A: Discovery (Phase 0〜1) ===
+  user-research → market-research → idea-to-spec + brand-foundation
+  [G1: 要件定義承認]
+
+=== Stage B: Design & Build (Phase 2〜5.5) ===
+  stack-selector + visual-designer → project-scaffold + github-repo-setup + ci-setup
+  → documentation-suite + landing-page-builder + legal-docs-generator + seo-setup + cookie-consent
+  → implementation + analytics-events → security-hardening
+  [G2: セキュリティゲート]
+
+=== Stage C: MVP Launch (Phase 6〜8) ===
+  monitoring-setup + release-checklist → deploy-setup → feedback-loop
+  [G3: MVP品質ゲート]
+
+=== Stage D: Alpha → 有料化 (Phase 9〜10) ===
+  pricing-strategy → payment-integration → onboarding-optimizer → email-strategy
+  [G4: Alpha→Beta判定]
+
+=== Stage E: Beta → 成長 (Phase 11〜12) ===
+  ab-testing + conversion-funnel → gdpr-compliance + data-deletion → retention-strategy
+  [G5: Beta→GA判定]
+
+=== Stage F: GA & Scale (Phase 13〜14) ===
+  incident-response + scaling-strategy → cost-optimization
+```
+
+## ゲート通過条件
+
+| ゲート | 主要条件 |
+|--------|---------|
+| G1 | ユーザーが requirements.md + brand-brief.md を承認 |
+| G2 | CRITICAL脆弱性=0, npm audit HIGH=0 |
+| G3 | ヘルスチェックOK, テストカバレッジ80%+, Lighthouse P90+/A95+ |
+| G4 | 有料ユーザー10人+, 7日リテンション20%+, Sentryエラー率<1% |
+| G5 | MRR $1K+, 30日リテンション15%+, 月次チャーン<10%, GDPR準拠完了 |
+
 ## 使い方
 
-### フル自動（0 → デプロイ）
+### 0 → MVP（Stage A〜C）
 
 ```
 /app-builder "ユーザーが自分の読んだ本を記録してレビューを書けるSNS"
@@ -68,13 +107,17 @@ claude plugin install claude-app-builder@claude-app-builder
 /app-builder "フリーランサー向け請求書管理ツール"
 ```
 
-**ユーザー介入ポイント（全6回）:**
-1. アイデア入力（起動時）
-2. 競合サービス名の入力（Phase 0.5、スキップ可能）
-3. **要件定義・ブランディングの承認**（承認ゲート1）← 修正要望を伝えられます
-4. Vercel/Supabase 無料プラン制限事項の確認（Phase 1内）
-5. `.env.local` への API キー入力（Phase 7前）
-6. **本番URL動作確認**（承認ゲート2）
+`/app-builder` は Stage A（Discovery）から Stage C（MVP Launch）までを自動実行します。
+Phase 0〜8 の全スキルを順次呼び出し、5つのゲートのうち G1〜G3 を通過してデプロイまで完了します。
+
+### MVP → MRR 成長（Stage D〜F）
+
+```
+/growth-engine
+```
+
+`/growth-engine` は MVP リリース後の成長フェーズ（Stage D〜F）を自動実行します。
+有料化・ユーザー獲得・リテンション・スケーリングまでを G4〜G5 ゲートで品質管理しながら進めます。
 
 ### 個別スキルを直接呼び出す
 
@@ -84,62 +127,61 @@ claude plugin install claude-app-builder@claude-app-builder
 /landing-page-builder
 /security-hardening
 /deploy-setup
+/pricing-strategy
+/payment-integration
+/ab-testing
+/retention-strategy
+/incident-response
+/cost-optimization
 ```
 
-## ワークフロー
-
-```
-Phase 0:   ユーザーリサーチ (user-research) ← 推奨
-Phase 0.5: 市場調査 (market-research) ← 推奨
-Phase 1:   要件定義 (idea-to-spec) → ブランディング (brand-foundation) ← 順次
-           ↓ ユーザー承認ゲート1
-Phase 2:   技術スタック選定 (stack-selector) + デザインシステム (visual-designer)
-Phase 3:   GitHub リポジトリ準備 + CI設定 (project-scaffold, ci-setup, github-repo-setup)
-Phase 4:   ドキュメント + LP + 法務 + SEO
-Phase 5:   TDD 実装 + テスト + 計測イベント (analytics-events)
-Phase 5.5: AI生成コードセキュリティ強化 ← Opus が担当
-Phase 6:   Sentry + Lighthouse CI + 36項目チェックリスト
-Phase 7:   Vercel + Supabase デプロイ + ローンチ素材生成
-Phase 8:   リリース報告 + フィードバック設計
-```
-
-## スキル一覧
+## スキル一覧（34 + オーケストレーター2）
 
 | スキル | Phase | モデル | 役割 |
 |--------|-------|--------|------|
-| `app-builder` | 全体 | **Opus** | オーケストレーター |
+| `app-builder` | 全体 (A〜C) | **Opus** | オーケストレーター（0→MVP） |
+| `growth-engine` | 全体 (D〜F) | **Opus** | オーケストレーター（MVP→MRR成長） |
 | `user-research` | 0 | Sonnet | ペルソナ・インタビューガイド・仮説検証 |
 | `market-research` | 0.5 | Sonnet | 競合調査・市場分析 |
 | `idea-to-spec` | 1 | Sonnet | アイデア→requirements.md |
 | `brand-foundation` | 1 | **Opus** | ブランド戦略 |
 | `stack-selector` | 2 | Sonnet | 技術スタック選定 |
 | `visual-designer` | 2 | **Opus** | デザインシステム（WCAG AA） |
+| `project-scaffold` | 3 | Haiku | Next.js / CLI テンプレート展開 |
+| `github-repo-setup` | 3 | Sonnet | Branch Protection + Dependabot |
+| `ci-setup` | 3 | Sonnet | GitHub Actions CI設定 |
 | `documentation-suite` | 4 | Sonnet | README + ARCHITECTURE |
 | `landing-page-builder` | 4 | Sonnet | LP + OGP + メタタグ |
 | `legal-docs-generator` | 4 | Sonnet | プライバシー・利用規約 |
 | `seo-setup` | 4 | Sonnet | サイトマップ・robots.txt・JSON-LD |
-| `project-scaffold` | 3 | Haiku | Next.js / CLI テンプレート展開 |
-| `github-repo-setup` | 3 | Sonnet | Branch Protection + Dependabot |
-| `ci-setup` | 3 | Sonnet | GitHub Actions CI設定 |
+| `cookie-consent` | 4 | Haiku | Cookie同意バナー・GDPR対応 |
 | `implementation` | 5 | Sonnet | TDD実装・テスト |
 | `analytics-events` | 5 | Sonnet | 計測イベント設計・Vercel Analytics実装 |
 | `security-hardening` | 5.5 | **Opus** | IDOR / RLS / シークレット自動スキャン |
 | `monitoring-setup` | 6 | Sonnet | Sentry + Vercel Analytics + Lighthouse CI |
 | `release-checklist` | 6 | Sonnet | 全項目チェック（CRITICAL明記） |
-| `deploy-setup` | 7 | Haiku | Vercel + Supabase デプロイ |
+| `deploy-setup` | 7 | Sonnet | Vercel + Supabase デプロイ |
 | `feedback-loop` | 8 | Sonnet | フィードバック設計 |
+| `pricing-strategy` | 9 | **Opus** | 価格戦略・プラン設計 |
+| `payment-integration` | 9 | Sonnet | Stripe統合・サブスクリプション |
+| `onboarding-optimizer` | 10 | **Opus** | オンボーディングフロー最適化 |
+| `email-strategy` | 10 | Sonnet | メールマーケティング（Resend / SendGrid） |
+| `ab-testing` | 11 | Sonnet | A/Bテスト設計・実装 |
+| `conversion-funnel` | 11 | **Opus** | コンバージョンファネル分析・最適化 |
+| `gdpr-compliance` | 11.5 | **Opus** | GDPR完全準拠・DPA対応 |
+| `data-deletion` | 11.5 | Sonnet | データ削除パイプライン・Right to Erasure |
+| `retention-strategy` | 12 | **Opus** | リテンション戦略・チャーン分析 |
+| `incident-response` | 13 | Sonnet | インシデント対応・ランブック |
+| `scaling-strategy` | 13 | Sonnet | スケーリング戦略・パフォーマンス計画 |
+| `cost-optimization` | 14 | Sonnet | インフラコスト最適化 |
 
-## スコープ外（v1）
+## MRR 成長ロードマップ
 
-以下は v1 の対象外です：
-
-- Stripe 等の決済統合（v2 予定）
-- メール送信（Resend / SendGrid）（v2 予定）
-- A/Bテスト（PostHog / Vercel Edge Config）（v2 予定）
-  ※ Vercel Edge Config は Vercel Pro 以上が必要
-- カスタムドメイン設定は deploy-setup に案内として含む
-- モバイルアプリ（React Native / Expo）は `stack-selector` で選択可能だが、
-  `/app-builder` フルフローはWebアプリのみ対応
+| フェーズ | 目標 MRR | 期間目安 | 主要スキル |
+|---------|---------|---------|-----------|
+| Alpha（Stage D） | $0 → $1K | 0〜3ヶ月 | pricing-strategy, payment-integration, onboarding-optimizer, email-strategy |
+| Beta（Stage E） | $1K → $5K | 3〜6ヶ月 | ab-testing, conversion-funnel, gdpr-compliance, data-deletion, retention-strategy |
+| GA / Scale（Stage F） | $5K → $50K | 6〜18ヶ月 | incident-response, scaling-strategy, cost-optimization |
 
 ## セキュリティ
 

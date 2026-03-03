@@ -102,13 +102,14 @@ supabase projects list 2>/dev/null || {
 2. `ci-setup` [Sonnet] → `.github/workflows/test.yml` 生成（ジョブ名: "test"）
 3. `github-repo-setup` [Haiku+Sonnet] → 公開設定 + Branch Protection（contexts: ["test"]）+ Dependabot
 
-### Phase 4: ドキュメント + LP + 法務 + SEO
+### Phase 4: ドキュメント + LP + 法務 + SEO + Cookie同意
 
 **実行スキル（並列）**:
 - `documentation-suite` [Sonnet] → `README.md` + `docs/`
 - `landing-page-builder` [Sonnet] → `app/landing/`
-- `legal-docs-generator` [Sonnet] → `app/privacy/` + `app/terms/`（※モデル変更はB1で対応）
+- `legal-docs-generator` [Sonnet] → `app/privacy/` + `app/terms/` + `app/cookies/` + `app/legal/`
 - `seo-setup` [Sonnet] → `src/app/sitemap.ts` + `robots.ts` + JSON-LD
+- `cookie-consent` [Haiku] → Cookie同意バナー + Google Consent Mode v2（EU対象時は必須）
 
 ### Phase 5: 実装 + テスト
 
@@ -117,6 +118,56 @@ supabase projects list 2>/dev/null || {
    - 完了条件: `npm run test:coverage` 80%以上 + TypeScript型エラーなし
 
 ※ 単一コンテキストで一貫性のある実装を行います。
+
+### G3: MVP品質ゲート（Phase 5 完了後・Phase 5.5 前）
+
+Phase 5.5 に進む前に以下を全て確認:
+
+```
+📋 G3 - MVP品質ゲート
+
+1. ヘルスチェック:
+   ✅ /api/health が HTTP 200 を返す
+
+2. テストカバレッジ:
+   ✅ npm run test:coverage → 80% 以上
+
+3. Lighthouse スコア:
+   ✅ Performance: 90+ (P90)
+   ✅ Accessibility: 95+ (A95)
+```
+
+```bash
+# G3 自動チェック
+echo "=== G3: MVP品質ゲート ==="
+G3_PASS=true
+
+# テストカバレッジ確認
+echo "📋 テストカバレッジ..."
+COVERAGE=$(npm run test:coverage 2>&1 | grep "All files" | awk '{print $4}' | tr -d '%')
+if [ -n "$COVERAGE" ] && [ "$(echo "$COVERAGE >= 80" | bc)" = "1" ]; then
+  echo "  ✅ カバレッジ: ${COVERAGE}% (>= 80%)"
+else
+  echo "  ❌ カバレッジ不足: ${COVERAGE:-N/A}% (< 80%)"
+  G3_PASS=false
+fi
+
+# ビルド確認（Lighthouse は本番デプロイ後に実行）
+echo "📋 ビルドチェック..."
+if npm run build 2>&1 | tail -1 | grep -q "error"; then
+  echo "  ❌ ビルドエラーあり"
+  G3_PASS=false
+else
+  echo "  ✅ ビルド成功"
+fi
+
+if [ "$G3_PASS" = false ]; then
+  echo ""
+  echo "❌ G3 品質ゲート未達。修正してから Phase 5.5 に進んでください"
+fi
+```
+
+⚠️ **G3 未達の場合は Phase 5.5 に進めない**。テスト追加・パフォーマンス改善を実施。
 
 ### Phase 5.5: セキュリティ強化（必須・スキップ不可）
 
@@ -129,7 +180,7 @@ supabase projects list 2>/dev/null || {
 
 **実行スキル（並列）**:
 - `monitoring-setup` [Sonnet] → Sentry + Analytics + Lighthouse CI
-- `release-checklist` [Sonnet] → 36項目チェック
+- `release-checklist` [Sonnet] → 50項目チェック + Go/No-Go 判断
 
 ### Phase 7: デプロイ実行 + ローンチ準備
 
@@ -163,11 +214,58 @@ supabase projects list 2>/dev/null || {
   - Typeform/Canny でフィードバック収集を設定（docs/feedback-strategy.md 参照）
   - Sentry でエラーを監視
   - 2週間後: ユーザーフィードバックを元に次イテレーション計画
+
+💰 グロース・収益化:
+  - /growth-engine で収益化戦略を立案（プライシング → 決済 → オンボーディング → メール → グロース）
+  - フィードバックデータが蓄積されてから実行を推奨
+```
+
+## フェーズゲート基準
+
+各フェーズ間にゲート（品質チェックポイント）を設置し、品質を担保する。
+`references/phase-gate-criteria.md` に各ゲートの通過条件を詳細に記載。
+
+| ゲート | 位置 | 通過条件 |
+|--------|------|---------|
+| G1 | Phase 1 後 | 要件定義承認（ユーザー確認） |
+| G2 | Phase 3 後 | リポジトリ・CI 正常動作 |
+| G3 | Phase 5 後 | テストカバレッジ 80%+, ビルド成功 |
+| G4 | Phase 5.5 後 | セキュリティ CRITICAL 問題なし |
+| G5 | Phase 6 後 | Go/No-Go 判断 Go |
+
+## 品質ダッシュボード自動生成
+
+Phase 6（release-checklist）完了後に `docs/quality-dashboard.md` を自動生成する。
+`references/quality-dashboard-template.md` のテンプレートに従い、以下を集約:
+
+```markdown
+## 品質ダッシュボード
+
+### テスト
+- カバレッジ: [X]%
+- ユニットテスト: [X]件 PASS / [X]件 FAIL
+- E2E テスト: [X]件 PASS / [X]件 FAIL
+
+### セキュリティ
+- IDOR チェック: ✅/❌
+- RLS 設定: ✅/❌
+- npm audit HIGH: [X]件
+- シークレットスキャン: ✅/❌
+
+### パフォーマンス
+- Lighthouse Performance: [X]
+- Lighthouse Accessibility: [X]
+- バンドルサイズ: [X]KB
+
+### リリースチェック
+- CRITICAL: [X]/[X] ✅
+- HIGH: [X]/[X] ✅
+- Go/No-Go: Go / Conditional Go / No-Go
 ```
 
 ## エラーハンドリング
 
-### 2回失敗でエスカレーション
+### 3回失敗でエスカレーション
 
 ```
 ⚠️ フェーズ名: [Phase X - スキル名] で問題が発生しました
@@ -194,5 +292,7 @@ supabase projects list 2>/dev/null || {
 | デザイン戦略 | `claude-opus-4-6` |
 | セキュリティレビュー | `claude-opus-4-6` |
 | 要件定義・実装・ドキュメント | `claude-sonnet-4-6` |
+| デプロイ | `claude-sonnet-4-6` |
 | テンプレート展開 | `claude-haiku-4-5-20251001` |
+| Cookie同意管理 | `claude-haiku-4-5-20251001` |
 | 法務文書 | `claude-sonnet-4-6` |

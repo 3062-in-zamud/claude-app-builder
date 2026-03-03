@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude App Builder - 更新スクリプト
+# Claude App Builder v3.0 - 更新スクリプト
 
 set -e
 
@@ -41,4 +41,6 @@ for cmd_file in "$LOCAL_DIR/commands/"*.md; do
 done
 
 echo ""
-echo "✅ 更新完了！"
+echo "✅ Claude App Builder v3.0 更新完了！"
+echo "   スキル数: $(ls -d "$SKILL_DIR"/*/ 2>/dev/null | wc -l | tr -d ' ') 個"
+echo "   コマンド数: $(ls "$CMD_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ') 個"

@@ -114,7 +114,62 @@ Zod スキーマでフロント+バックエンド両方で検証しているか
 
 ユーザー入力がプロンプトに直接結合されていないか確認。
 
-### Step 4: npm audit
+### Step 4: セキュリティヘッダー検証
+
+6種の必須セキュリティヘッダーを確認（詳細は `references/security-headers-config.md`）:
+
+| ヘッダー | 目的 | 推奨値 |
+|---------|------|--------|
+| **Content-Security-Policy** | XSS・データインジェクション防止 | `default-src 'self'; script-src 'self' 'unsafe-inline'...` |
+| **Strict-Transport-Security** | HTTPS 強制 | `max-age=63072000; includeSubDomains; preload` |
+| **X-Frame-Options** | クリックジャッキング防止 | `DENY` |
+| **X-Content-Type-Options** | MIME スニッフィング防止 | `nosniff` |
+| **Referrer-Policy** | リファラー情報制御 | `strict-origin-when-cross-origin` |
+| **Permissions-Policy** | ブラウザ機能制御 | `camera=(), microphone=(), geolocation=()` |
+
+```bash
+# ヘッダー確認（ローカル）
+curl -I http://localhost:3000 2>/dev/null | grep -iE "content-security|strict-transport|x-frame|x-content-type|referrer-policy|permissions-policy"
+```
+
+### Step 5: OWASP API Security Top 10 チェック
+
+全 API エンドポイントに対して以下を確認（詳細は `references/api-security-top10.md`）:
+
+| # | リスク | チェック内容 |
+|---|--------|------------|
+| API1 | BOLA（オブジェクトレベル認可の不備） | 全エンドポイントで所有者検証 |
+| API2 | 認証の不備 | トークン検証・セッション管理 |
+| API3 | オブジェクトプロパティレベル認可の不備 | レスポンスの過剰データ露出防止 |
+| API4 | 無制限のリソース消費 | Rate Limiting・ペイロード制限 |
+| API5 | 機能レベル認可の不備 | 管理者API・ロールベースアクセス |
+| API6 | 機密ビジネスフローへの無制限アクセス | ボット対策・フロー制御 |
+| API7 | SSRF | 外部URL入力の検証 |
+| API8 | セキュリティ設定の不備 | CORS・ヘッダー・エラーメッセージ |
+| API9 | 不適切なインベントリ管理 | 未使用エンドポイントの削除 |
+| API10 | 安全でないAPIの使用 | サードパーティAPI呼び出しの検証 |
+
+### Step 6: Supply Chain Security
+
+```bash
+# npm 署名検証（npm v9+）
+npm audit signatures
+
+# lockfile 整合性チェック
+npm ci --ignore-scripts  # lockfile と package.json の一致を確認
+
+# 依存関係のライセンスチェック
+npx license-checker --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC"
+```
+
+**Supply Chain チェックリスト**:
+- [ ] `package-lock.json` がリポジトリにコミットされている
+- [ ] `npm audit signatures` で署名不整合がない
+- [ ] CI で `npm ci`（`npm install` ではなく）を使用している
+- [ ] 不要な依存関係が残っていない
+- [ ] postinstall スクリプトが安全か確認済み
+
+### Step 7: npm audit
 
 ```bash
 npm audit --audit-level=high
@@ -162,3 +217,6 @@ npm audit:
 - [ ] エラーメッセージにスタックトレースなし
 - [ ] 入力バリデーション実装済み（Zod）
 - [ ] npm audit で HIGH 以上なし
+- [ ] セキュリティヘッダー6種が設定されている
+- [ ] OWASP API Security Top 10 チェック完了
+- [ ] Supply Chain Security（署名検証・lockfile整合性）確認済み

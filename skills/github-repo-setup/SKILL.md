@@ -89,6 +89,68 @@ CREATE POLICY "Users can delete own data" ON [table_name]
 - Dependabot 設定ファイル（`.github/dependabot.yml`）
 - Supabase RLS 初期 SQL
 
+### Step 7: Issue/PR テンプレート
+
+`references/issue-pr-templates/` に従い、テンプレートファイルを配置する:
+
+```
+.github/
+├── ISSUE_TEMPLATE/
+│   ├── bug_report.md
+│   └── feature_request.md
+└── PULL_REQUEST_TEMPLATE.md
+```
+
+### Step 8: CODEOWNERS 設定
+
+```bash
+# .github/CODEOWNERS を作成
+cat > .github/CODEOWNERS << 'EOF'
+# デフォルトオーナー
+* @[owner]
+
+# フロントエンド
+/src/app/ @[owner]
+/src/components/ @[owner]
+
+# インフラ・CI
+/.github/ @[owner]
+/supabase/ @[owner]
+EOF
+```
+
+### Step 9: Release 自動化
+
+semantic-release または GitHub Releases による自動リリース設定:
+
+```yaml
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create Release
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: node
+```
+
+Conventional Commits に基づき、自動で CHANGELOG.md を更新し GitHub Release を作成する。
+
 ### 品質チェック
 
 - [ ] Branch Protection ルールが設定されているか
@@ -96,3 +158,7 @@ CREATE POLICY "Users can delete own data" ON [table_name]
 - [ ] Dependabot が有効か
 - [ ] GitHub Secret Scanning が有効か
 - [ ] Supabase RLS の初期 SQL が提示されているか
+- [ ] Issue テンプレート（Bug Report, Feature Request）が配置されているか
+- [ ] PR テンプレートが配置されているか
+- [ ] CODEOWNERS が設定されているか
+- [ ] Release 自動化ワークフローが設定されているか

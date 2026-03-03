@@ -116,7 +116,113 @@ GA4の基本設定:
    )}
    ```
 
-### Step 3: Lighthouse CI 設定
+### Step 3: SLO/SLI/Error Budget 定義
+
+サービスレベル目標を設定（詳細は `references/slo-sli-error-budget.md`）:
+
+| SLI (指標) | SLO (目標) | Error Budget (月間) |
+|------------|-----------|-------------------|
+| 可用性 (成功リクエスト率) | 99.9% | 43.8分のダウンタイム |
+| レイテンシ (p99) | < 500ms | 0.1% のリクエストが超過可能 |
+| エラーレート | < 0.1% | 月間リクエスト数の0.1% |
+
+**Error Budget ポリシー**:
+- Budget 残 > 50%: 通常開発（機能追加優先）
+- Budget 残 25-50%: 信頼性改善を並行実施
+- Budget 残 < 25%: 機能追加を凍結、信頼性改善に集中
+- Budget 消費: デプロイ頻度を下げ、ロールバック基準を厳格化
+
+### Step 4: アラート設計（P0-P3 4段階）
+
+詳細は `references/alert-design-guide.md`:
+
+| 優先度 | 対応時間 | 条件例 | 通知先 |
+|--------|---------|--------|--------|
+| **P0 Critical** | 即時（5分以内） | サービス全面停止・データ漏洩 | PagerDuty + Slack + 電話 |
+| **P1 High** | 1時間以内 | 主要機能障害・エラー率5%超 | Slack + メール |
+| **P2 Medium** | 4時間以内 | パフォーマンス劣化・部分障害 | Slack |
+| **P3 Low** | 翌営業日 | 軽微な問題・閾値接近 | メール（日次ダイジェスト） |
+
+**Sentry アラート設定例**:
+```typescript
+// sentry.server.config.ts に追加
+Sentry.init({
+  // ... 既存設定
+  // P0: 1分間に50件以上のエラー
+  // P1: 1分間に10件以上のエラー
+  // P2: 1時間に50件以上のエラー
+  // → Sentry Dashboard > Alerts で設定
+})
+```
+
+### Step 5: 4 Golden Signals ダッシュボード
+
+Vercel Analytics + Sentry で以下を監視:
+
+| Signal | 計測方法 | 閾値 |
+|--------|---------|------|
+| **Latency** | Vercel Speed Insights (p50/p95/p99) | p99 < 500ms |
+| **Traffic** | Vercel Analytics (リクエスト数/分) | ベースラインの200%超でアラート |
+| **Errors** | Sentry エラーレート | > 0.1% でアラート |
+| **Saturation** | Vercel Functions 実行時間・メモリ | 80%超でアラート |
+
+### Step 6: 構造化ログ設計
+
+```typescript
+// src/lib/logger.ts
+type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+
+interface StructuredLog {
+  level: LogLevel
+  message: string
+  timestamp: string
+  correlationId: string  // リクエスト横断の追跡ID
+  requestId: string      // 個別リクエストID
+  service: string
+  [key: string]: unknown
+}
+
+export function createLogger(service: string) {
+  return {
+    info: (message: string, meta?: Record<string, unknown>) =>
+      console.log(JSON.stringify({
+        level: 'info',
+        message,
+        timestamp: new Date().toISOString(),
+        service,
+        ...meta,
+      })),
+    error: (message: string, error?: Error, meta?: Record<string, unknown>) =>
+      console.error(JSON.stringify({
+        level: 'error',
+        message,
+        timestamp: new Date().toISOString(),
+        service,
+        error: error ? { name: error.name, message: error.message, stack: error.stack } : undefined,
+        ...meta,
+      })),
+  }
+}
+```
+
+**Correlation ID の伝播**:
+```typescript
+// middleware.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { randomUUID } from 'crypto'
+
+export function middleware(request: NextRequest) {
+  const correlationId = request.headers.get('x-correlation-id') || randomUUID()
+  const requestId = randomUUID()
+
+  const response = NextResponse.next()
+  response.headers.set('x-correlation-id', correlationId)
+  response.headers.set('x-request-id', requestId)
+  return response
+}
+```
+
+### Step 7: Lighthouse CI 設定
 
 ```bash
 npm install -D @lhci/cli
@@ -191,3 +297,8 @@ jobs:
 - [ ] Lighthouse 閾値が Performance 90+, Accessibility 95+ か
 - [ ] Core Web Vitals が設定されているか
 - [ ] GitHub Dependabot が有効か
+- [ ] SLO/SLI が定義され `docs/slo.md` に記載されているか
+- [ ] P0-P3 アラートルールが Sentry に設定されているか
+- [ ] 4 Golden Signals のダッシュボードが構成されているか
+- [ ] 構造化ログ（JSON + Correlation ID）が実装されているか
+- [ ] Error Budget ポリシーが定義されているか

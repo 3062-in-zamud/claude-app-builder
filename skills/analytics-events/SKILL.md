@@ -27,7 +27,53 @@ Vercel Analytics カスタムイベントとして実装します。
 - 成功の定義（3ヶ月後にどうなっていれば成功か）
 - MVP機能（P0）
 
-### Step 2: 計測イベントの設計
+### Step 2: AARRR Pirate Metrics 対応イベント設計
+
+成功指標を AARRR フレームワークで整理し、各ステージのイベントを定義（詳細は `references/aarrr-pirate-metrics.md`）:
+
+| ステージ | 意味 | 主要イベント |
+|---------|------|------------|
+| **Acquisition** | ユーザー獲得 | `page_viewed`, `utm_tracked`, `referral_landed` |
+| **Activation** | 初期体験 | `sign_up_completed`, `onboarding_completed`, `first_value_moment` |
+| **Retention** | 継続利用 | `return_visit`, `session_started`, `feature_used` |
+| **Revenue** | 収益化 | `upgrade_clicked`, `purchase_completed`, `subscription_started` |
+| **Referral** | 紹介 | `share_clicked`, `invite_sent`, `referral_completed` |
+
+### Step 2.5: イベントスキーマガバナンス
+
+イベント命名規則とスキーマバージョニングを定義（詳細は `references/event-schema-governance.md`）:
+
+**命名規則**:
+- フォーマット: `{object}_{action}` (snake_case)
+- 例: `sign_up_completed`, `post_created`, `upgrade_clicked`
+- 禁止: camelCase、ハイフン区切り、動詞始まり
+
+**スキーマバージョニング**:
+```typescript
+// イベントスキーマ型定義
+interface EventSchema {
+  schemaVersion: '1.0'
+  event: string
+  timestamp: string
+  properties: Record<string, string | number | boolean>
+}
+```
+
+### Step 2.6: コホート分析用イベント設計
+
+リテンション分析に必要なコホート識別プロパティを付与:
+
+```typescript
+// コホート識別に必要なプロパティ
+interface CohortProperties {
+  signup_date: string      // YYYY-MM-DD（登録日コホート）
+  signup_source: string    // 流入元コホート
+  plan_type: string        // プラン別コホート
+  first_feature: string    // 初回利用機能コホート
+}
+```
+
+### Step 3: 計測イベントの詳細設計
 
 成功指標から逆算して計測すべきイベントを定義:
 
@@ -112,6 +158,46 @@ export const Analytics = {
 } as const
 ```
 
+### Step 3.5: プライバシーファースト計測
+
+Cookie同意状態に応じて計測レベルを切り替える（`cookie-consent` スキルと連携）:
+
+```typescript
+// src/lib/analytics.ts に追加
+type ConsentLevel = 'essential' | 'analytics' | 'marketing'
+
+let currentConsent: ConsentLevel = 'essential'
+
+export function setConsentLevel(level: ConsentLevel): void {
+  currentConsent = level
+}
+
+export function track(event: string, properties?: EventProperties): void {
+  // essential のみ同意: 計測しない
+  if (currentConsent === 'essential') return
+
+  // analytics 同意: 匿名化して計測
+  if (currentConsent === 'analytics') {
+    const anonymized = { ...properties }
+    // PII を除外
+    delete anonymized.email
+    delete anonymized.name
+    delete anonymized.user_id
+    vercelTrack(event, anonymized)
+    return
+  }
+
+  // marketing 同意: フル計測
+  vercelTrack(event, properties)
+}
+```
+
+**プライバシーチェックリスト**:
+- [ ] Cookie同意バナーとの連携が実装されている
+- [ ] 同意前にトラッキングが発火しない
+- [ ] analytics レベルでは PII が除外される
+- [ ] GDPR/個人情報保護法に準拠している
+
 ### Step 4: Vercel Analytics のセットアップ確認
 
 ```bash
@@ -189,3 +275,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 - [ ] 開発環境でのデバッグログが含まれているか
 - [ ] イベントプロパティが過剰でないか（個人情報を含めない）
 - [ ] ファネル分析に必要なイベントが網羅されているか
+- [ ] AARRR 各ステージのイベントが定義されているか
+- [ ] コホート分析用プロパティ（signup_date, signup_source）が含まれているか
+- [ ] Cookie同意レベルに応じた計測制御が実装されているか
+- [ ] イベント命名規則が `{object}_{action}` (snake_case) に統一されているか
+- [ ] イベントスキーマバージョンが定義されているか

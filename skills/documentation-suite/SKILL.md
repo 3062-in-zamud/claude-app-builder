@@ -59,9 +59,69 @@ docs/brand-brief.md
 - `docs/CONTRIBUTING.md`
 - `docs/ARCHITECTURE.md`
 
+### Step 5: ADR 連携
+
+`docs/adr/` ディレクトリが存在する場合（stack-selector で生成）、
+ARCHITECTURE.md に ADR へのリンクを追加する:
+
+```markdown
+## アーキテクチャ決定記録（ADR）
+
+技術的な意思決定の記録は以下を参照:
+
+| # | タイトル | ステータス |
+|---|---------|-----------|
+| [ADR-0001](./adr/0001-xxx.md) | [タイトル] | Accepted |
+| [ADR-0002](./adr/0002-xxx.md) | [タイトル] | Accepted |
+```
+
+### Step 6: Changelog 標準化
+
+`references/changelog-format.md` に従い、`CHANGELOG.md` を Keep a Changelog 形式で生成する:
+
+```markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Initial MVP release
+
+## [0.1.0] - YYYY-MM-DD
+
+### Added
+- [機能1]
+- [機能2]
+```
+
+### Step 7: Runbook 生成
+
+`references/runbook-template.md` に従い、`docs/runbook.md`（オペレーション手順書）を生成する:
+
+- デプロイ手順
+- ロールバック手順
+- 障害対応手順（よくある障害パターンと対処法）
+- 環境変数の変更手順
+
+### 出力ファイル
+
+- `README.md`（プロジェクトルート）
+- `docs/CONTRIBUTING.md`
+- `docs/ARCHITECTURE.md`
+- `CHANGELOG.md`
+- `docs/runbook.md`
+
 ### 品質チェック
 
 - [ ] README に「5分でセットアップできる」手順があるか
 - [ ] `.env.example` の参照が含まれているか
 - [ ] テスト実行コマンドが記載されているか
 - [ ] Mermaid 図が正しく記述されているか
+- [ ] ADR へのリンクが ARCHITECTURE.md に含まれているか（ADR 存在時）
+- [ ] CHANGELOG.md が Keep a Changelog 形式で作成されているか
+- [ ] Runbook（docs/runbook.md）が作成されているか

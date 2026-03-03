@@ -77,9 +77,83 @@ gh repo create [プロジェクト名] --public --source=. --remote=origin --pus
 - 生成されたプロジェクトディレクトリ
 - GitHub リポジトリ URL
 
+### Step 5: Husky + lint-staged 設定
+
+`references/precommit-hook-setup.md` に従い、pre-commit フックを設定する:
+
+```bash
+# Husky インストール
+npm install -D husky lint-staged
+npx husky init
+
+# pre-commit フック設定
+echo "npx lint-staged" > .husky/pre-commit
+```
+
+`package.json` に lint-staged 設定を追加:
+
+```json
+{
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,yml}": ["prettier --write"]
+  }
+}
+```
+
+### Step 6: Zod 環境変数バリデーション
+
+`references/env-validation-setup.md` に従い、環境変数の型安全な読み込みを設定する:
+
+```bash
+npm install zod
+```
+
+`src/env.ts` を生成:
+
+```typescript
+import { z } from 'zod'
+
+const envSchema = z.object({
+  NEXT_PUBLIC_APP_URL: z.string().url(),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+})
+
+export const env = envSchema.parse({
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+})
+```
+
+### Step 7: EditorConfig 設定
+
+`.editorconfig` を生成:
+
+```ini
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.md]
+trim_trailing_whitespace = false
+```
+
 ### 品質チェック
 
 - [ ] `.gitignore` に `.env*` が含まれているか
 - [ ] `.env.example` に全必要環境変数が記載されているか（値なし）
 - [ ] 初期コミットが完了しているか
 - [ ] GitHub リポジトリが作成されているか
+- [ ] Husky + lint-staged が設定されているか
+- [ ] `src/env.ts` で環境変数バリデーションが設定されているか
+- [ ] `.editorconfig` が配置されているか
