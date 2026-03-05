@@ -1,0 +1,28 @@
+name: Plugin Consistency
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run consistency audit
+        run: python scripts/audit-plugin-consistency.py
+
+      - name: Shell syntax check
+        run: |
+          bash -n install.sh
+          bash -n update.sh
+          bash -n uninstall.sh
