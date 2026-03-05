@@ -1,18 +1,23 @@
 #!/bin/bash
-# Claude App Builder v3.0 - インストールスクリプト
+# Claude App Builder v3.1 - インストールスクリプト
 # Usage: curl -fsSL https://raw.githubusercontent.com/3062-in-zamud/claude-app-builder/main/install.sh | bash
 # または: bash install.sh
 
-set -e
+set -euo pipefail
+shopt -s nullglob
 
 INSTALL_DIR="$HOME/.claude"
 SKILL_DIR="$INSTALL_DIR/skills"
 CMD_DIR="$INSTALL_DIR/commands"
+MANIFEST_DIR="$INSTALL_DIR/.claude-app-builder"
+SKILL_MANIFEST="$MANIFEST_DIR/skills.txt"
+CMD_MANIFEST="$MANIFEST_DIR/commands.txt"
 LOCAL_DIR="$HOME/.claude-app-builder"
 REPO_URL="https://github.com/3062-in-zamud/claude-app-builder"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "🚀 Claude App Builder v3.0 インストール開始"
+
+echo "🚀 Claude App Builder v3.1 インストール開始"
 echo ""
 
 # ===== 1. 前提ツール確認 =====
@@ -25,15 +30,16 @@ check_tool() {
 }
 
 echo "📋 前提ツール確認:"
-check_tool gh       "https://cli.github.com/"
-check_tool vercel   "npm install -g vercel"
+check_tool gh "https://cli.github.com/"
 check_tool supabase "npm install -g supabase"
-check_tool node     "https://nodejs.org/"
-check_tool git      "https://git-scm.com/"
+check_tool vercel "npm install -g vercel（Vercelデプロイ時）"
+check_tool wrangler "npm install -g wrangler（Cloudflareデプロイ時）"
+check_tool node "https://nodejs.org/"
+check_tool git "https://git-scm.com/"
 echo ""
 
 # ===== 2. ソースの取得 =====
-if [ -d "$SCRIPT_DIR/skills" ]; then
+if [ -d "$SCRIPT_DIR/skills" ] && [ -d "$SCRIPT_DIR/commands" ]; then
   # ローカルインストール（リポジトリからの直接実行）
   SOURCE_DIR="$SCRIPT_DIR"
   echo "📁 ローカルインストール: $SOURCE_DIR"
@@ -53,42 +59,57 @@ echo ""
 
 # ===== 3. ~/.claude/skills/ にインストール =====
 echo "📦 スキルをインストール中..."
-mkdir -p "$SKILL_DIR"
+mkdir -p "$SKILL_DIR" "$MANIFEST_DIR"
+: > "$SKILL_MANIFEST"
 
-for skill_dir in "$SOURCE_DIR/skills"/*/; do
+for skill_dir in "$SOURCE_DIR/skills"/*; do
+  [ -d "$skill_dir" ] || continue
+  [ -f "$skill_dir/SKILL.md" ] || continue
+
   skill_name=$(basename "$skill_dir")
   ln -sfn "$skill_dir" "$SKILL_DIR/$skill_name"
+  echo "$skill_name" >> "$SKILL_MANIFEST"
   echo "  ✅ $skill_name"
 done
+sort -u -o "$SKILL_MANIFEST" "$SKILL_MANIFEST"
 echo ""
 
 # ===== 4. ~/.claude/commands/ にコマンド追加 =====
 echo "⚡ コマンドをインストール中..."
 mkdir -p "$CMD_DIR"
-# 全コマンドファイルをコピー
-for cmd_file in "$SOURCE_DIR/commands/"*.md; do
+: > "$CMD_MANIFEST"
+
+for cmd_file in "$SOURCE_DIR/commands"/*.md; do
+  [ -f "$cmd_file" ] || continue
   cmd_name=$(basename "$cmd_file")
+  [ "$cmd_name" = "CLAUDE.md" ] && continue
+
   cp "$cmd_file" "$CMD_DIR/$cmd_name"
+  echo "${cmd_name%.md}" >> "$CMD_MANIFEST"
   echo "  ✅ /${cmd_name%.md} コマンド"
 done
+sort -u -o "$CMD_MANIFEST" "$CMD_MANIFEST"
 echo ""
 
 # ===== 5. ~/.claude/CLAUDE.md に注記追加（重複チェック付き） =====
 CLAUDE_MD="$INSTALL_DIR/CLAUDE.md"
 if [ -f "$CLAUDE_MD" ] && ! grep -q "claude-app-builder" "$CLAUDE_MD" 2>/dev/null; then
-  cat >> "$CLAUDE_MD" << 'EOF'
+  cat >> "$CLAUDE_MD" << 'EOF_APPEND'
 
+# BEGIN claude-app-builder Plugin
 ---
 # claude-app-builder Plugin
 # 0→MVP→MRR $50Kまで全自動化スキル。/app-builder で起動、/growth-engine で成長フェーズ。
+# デプロイ先: Vercel / Cloudflare Pages（deployment_provider で選択）
 # 詳細: ~/.claude-app-builder/README.md または ~/.claude/skills/app-builder/SKILL.md
-EOF
+# END claude-app-builder Plugin
+EOF_APPEND
   echo "📝 ~/.claude/CLAUDE.md を更新しました"
 fi
 
 echo ""
 echo "═══════════════════════════════════"
-echo "✅ Claude App Builder v3.0 インストール完了！"
+echo "✅ Claude App Builder v3.1 インストール完了！"
 echo ""
 echo "使い方:"
 echo "  /app-builder \"あなたのアイデア\"  - 0→MVPリリース（Stage A〜C）"
