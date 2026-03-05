@@ -17,7 +17,7 @@
 [ユーザー] → [Next.js App] → [Supabase Auth] → 認証データ
                            → [Supabase DB]   → プロフィール、コンテンツ
                            → [Stripe]        → 決済データ
-                           → [Vercel Analytics] → 行動データ（匿名化可）
+                           → [Provider Analytics] → 行動データ（匿名化可）
                            → [Sentry]        → エラーデータ（IP含む可能性）
                            → [Resend]        → メールアドレス、送信ログ
 ```
@@ -27,7 +27,7 @@
 | サービス | 役割 | 所在地 | DPA | データ項目 |
 |---------|------|--------|-----|-----------|
 | Supabase | DB・認証 | US/EU | [リンク] | 全ユーザーデータ |
-| Vercel | ホスティング | US | [リンク] | リクエストログ |
+| Deployment Provider（Vercel / Cloudflare） | ホスティング | provider依存 | [リンク] | リクエストログ |
 | Stripe | 決済 | US | [リンク] | 決済情報 |
 | Sentry | エラー監視 | US | [リンク] | エラーログ、IP |
 | Resend | メール送信 | US | [リンク] | メールアドレス |

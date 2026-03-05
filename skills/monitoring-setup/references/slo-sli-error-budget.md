@@ -18,7 +18,7 @@ SLI = 成功レスポンス数 / 全リクエスト数
 ```
 
 計測方法:
-- Vercel Analytics のステータスコード分布
+- provider Analytics のステータスコード分布
 - Sentry のエラーイベント数
 - Uptime モニタリング（UptimeRobot, Betterstack）
 
@@ -42,7 +42,7 @@ SLI = p99(レスポンス時間) < 閾値 のリクエスト割合
 ```
 
 計測方法:
-- Vercel Speed Insights（TTFB, FCP, LCP）
+- provider Performance Analytics（TTFB, FCP, LCP）
 - Sentry Performance（トランザクション時間）
 
 ### エラーレート（Error Rate）
@@ -53,7 +53,7 @@ SLI = エラーリクエスト数(5xx) / 全リクエスト数
 
 計測方法:
 - Sentry エラーイベント数
-- Vercel Logs のステータスコード
+- provider Logs のステータスコード
 
 ## SLO 定義テンプレート
 
@@ -82,7 +82,7 @@ SLI = エラーリクエスト数(5xx) / 全リクエスト数
 ### 1. 可用性
 - **SLI**: HTTP 2xx/3xx レスポンスの割合
 - **SLO**: >= 99.9%
-- **計測方法**: Vercel Analytics + Sentry
+- **計測方法**: provider Analytics + Sentry
 - **除外条件**: メンテナンスウィンドウ（事前通知済み）
 
 ### 2. レイテンシ

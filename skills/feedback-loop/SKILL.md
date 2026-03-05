@@ -20,7 +20,8 @@ allowed-tools:
 
 ### Step 1: フィードバック収集チャネルの設計
 
-`docs/requirements.md` と `docs/brand-brief.md` を読み込んでターゲットユーザーを確認する。
+`docs/requirements.md` と `docs/brand-brief.md` を読み込んでターゲットユーザーを確認する。  
+`docs/tech-stack.md` が存在する場合は `deployment_provider` も読み取り、計測経路を確定する。
 
 ### Step 2: フィードバックツール選定
 
@@ -40,7 +41,7 @@ Week 1: 初期ユーザー獲得
   - 初期ユーザー5名にインタビュー依頼
 
 Week 2: データ分析
-  - Vercel Analytics でユーザー行動を確認
+  - provider Analytics（Vercel / Cloudflare）または custom events でユーザー行動を確認
   - Sentry でエラーを監視
   - Typeform アンケート結果を分析
 ```
@@ -89,7 +90,7 @@ Week 2: データ分析
 - **定義**: [具体的な計測方法]
 - **現在値**: 0（ローンチ直後）
 - **2週間目標**: [数値]
-- **計測方法**: [Vercel Analytics / カスタムイベント]
+- **計測方法**: [provider Analytics / カスタムイベント]
 ```
 
 ### Step 6: RICE/ICE スコアリングによる優先順位付け
@@ -157,7 +158,7 @@ ORDER BY c.cohort_week;
 
 | ステップ | イベント名 | 計測方法 |
 |---------|-----------|---------|
-| Awareness | page_view | Vercel Analytics |
+| Awareness | page_view | provider Analytics |
 | Interest | cta_click | カスタムイベント |
 | Activation | sign_up_complete | Supabase Auth |
 | Engagement | core_action | カスタムイベント |
@@ -258,6 +259,7 @@ LIMIT 20;
 - [ ] コホート分析 SQL が含まれている
 - [ ] ファネル分析設計が含まれている
 - [ ] NPS 計測フローが含まれている
+- [ ] deployment_provider に応じた計測経路（Analytics/Logs）が明記されている
 - [ ] フィードバック収集ツールの設定手順が記載されている
 - [ ] 次イテレーションのP1機能候補が記載されている
 - [ ] スプリントプランニングテンプレートが含まれている

@@ -111,7 +111,7 @@ YYYY-MM-DD
 |---|---------|---------|
 | 0001 | Use Next.js App Router for frontend framework | フレームワーク |
 | 0002 | Use Supabase for database and authentication | バックエンド |
-| 0003 | Use Vercel for deployment | インフラ |
+| 0003 | Use {deployment_provider} for deployment | インフラ |
 | 0004 | Use Tailwind CSS + shadcn/ui for styling | UI |
 | 0005 | Use Vitest for unit testing | テスト |
 | 0006 | Use Stripe for payment processing | 決済 |

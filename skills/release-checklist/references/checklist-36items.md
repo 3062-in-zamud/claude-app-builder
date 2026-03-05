@@ -50,13 +50,13 @@
 ## Phase 6: デプロイ準備（4項目）
 
 - [ ] P6-1: Sentry が設定されているか（DSN 環境変数）
-- [ ] P6-2: Vercel Analytics が設定されているか
+- [ ] P6-2: provider Analytics が設定されているか
 - [ ] P6-3: Lighthouse スコアが Performance 90+, Accessibility 95+ か
 - [ ] P6-4: GitHub Dependabot が有効か
 
 ## Phase 7: デプロイ（3項目）
 
-- [ ] P7-1: 環境変数が Vercel ダッシュボードに設定されているか
+- [ ] P7-1: 環境変数が provider ダッシュボードに設定されているか
 - [ ] P7-2: Supabase マイグレーションが本番に適用されているか
 - [ ] P7-3: ユーザーサポートの連絡先が LP に記載されているか
 

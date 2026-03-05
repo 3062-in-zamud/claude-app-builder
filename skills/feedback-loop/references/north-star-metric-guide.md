@@ -40,7 +40,7 @@
 - 行動可能: [オンボーディング改善・機能追加で直接影響可能]
 
 ### 計測方法
-- データソース: [Supabase events テーブル / Vercel Analytics]
+- データソース: [Supabase events テーブル / provider Analytics]
 - 集計頻度: 日次
 - ダッシュボード: [Metabase / Google Sheets]
 

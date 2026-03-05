@@ -112,7 +112,8 @@ release-checklist 完了後に `docs/quality-dashboard.md` として自動生成
 
 | 項目 | 状態 |
 |------|------|
-| Vercel プラン | [Hobby/Pro] |
+| Deployment Provider | [vercel / cloudflare-pages] |
+| Provider プラン | [Free/Hobby/Pro/Business] |
 | Supabase プラン | [Free/Pro] |
 | Sentry 設定 | ✅/❌ |
 | Dependabot | ✅/❌ |

@@ -6,10 +6,10 @@
 - Next.js 15 + TypeScript
 - Tailwind CSS + shadcn/ui
 - Supabase（Auth + PostgreSQL + RLS）
-- Vercel デプロイ
+- deployment_provider（Vercel / Cloudflare Pages）
 - Vitest（ユニット）+ Playwright（E2E）
 
-**Pro**: フルスタック一体、Vercel との親和性高、型安全
+**Pro**: フルスタック一体、provider選択肢を保ったまま型安全
 **Con**: 学習曲線、バンドルサイズ
 **適用**: SaaS, SNS, ダッシュボード, EC
 

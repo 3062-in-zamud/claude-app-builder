@@ -94,7 +94,7 @@ cohort_week | cohort_size | week_0 | week_1 | week_2 | week_3
 | Supabase Dashboard | SQL直接実行 | 無料 |
 | Metabase（self-hosted） | ダッシュボード | 無料 |
 | Google Sheets + IMPORTDATA | 簡易グラフ | 無料 |
-| Vercel Analytics | ページビュー分析 | 無料枠あり |
+| provider Analytics | ページビュー分析 | プラン依存 |
 
 ## 業界ベンチマーク
 
