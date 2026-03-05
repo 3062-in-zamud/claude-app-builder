@@ -3,7 +3,7 @@ name: scaling-strategy
 description: |
   What: ユーザー数別スケーリング戦略・パフォーマンスバジェット・キャッシュ戦略を策定する
   When: Phase 13（GA/Scale）でプロダクトの成長に備えたスケーリング計画を立てるとき
-  How: マイルストーン別のインフラ構成・コネクションプーリング・キャッシュ・DB最適化を含む段階的スケーリングロードマップを生成する
+  How: deployment_provider を前提に、マイルストーン別のインフラ構成・キャッシュ・DB最適化を段階的に設計する
 model: claude-sonnet-4-6
 allowed-tools:
   - Read
@@ -15,7 +15,10 @@ allowed-tools:
 
 ## 概要
 
-プロダクトの成長段階に応じた段階的なスケーリング戦略を策定する。ユーザー数のマイルストーンごとに、インフラ構成・パフォーマンス最適化・コスト管理のバランスを取った実践的なロードマップを生成する。Vercel + Supabase スタックに最適化し、過剰投資を避けながら成長に対応する。
+プロダクトの成長段階に応じた段階的なスケーリング戦略を策定する。
+ユーザー数のマイルストーンごとに、インフラ構成・パフォーマンス最適化・コスト管理のバランスを取った実践的なロードマップを生成する。
+
+このスキルは `deployment_provider`（`vercel` / `cloudflare-pages`）に追従し、provider前提の実行制約と運用コストを明示する。
 
 ## ワークフロー
 
@@ -29,76 +32,90 @@ allowed-tools:
 - `docs/deploy-setup.md`
 - `docs/database-schema.md`
 
-存在しないファイルはスキップし、一般的なVercel + Supabaseスタックを前提に進める。
+`docs/tech-stack.md` がある場合は `deployment_provider` を必ず確認する。
+
+```bash
+extract_value() {
+  local key="$1"
+  grep -E "^[[:space:]-]*${key}:" docs/tech-stack.md 2>/dev/null | head -1 | sed -E "s/^[[:space:]-]*${key}:[[:space:]]*//" | tr -d '\r'
+}
+
+if [ -f docs/tech-stack.md ]; then
+  DEPLOYMENT_PROVIDER="$(extract_value deployment_provider)"
+  [ -n "$DEPLOYMENT_PROVIDER" ] || { echo "❌ deployment_provider が未定義です"; exit 1; }
+fi
+```
 
 ### Step 2: ユーザー数別マイルストーン計画
 
 各マイルストーンで必要なインフラ変更・コスト目安・重点施策を定義する:
 
 #### Stage 1: 0-100ユーザー（MVP/Early Adopter）
-- **インフラ**: Supabase Free, Vercel Hobby
-- **月額コスト目安**: $0-20
-- **重点**: プロダクト改善に集中、スケーリングは不要
+- **インフラ**: Supabase Free + provider Free（Vercel Hobby または Cloudflare Pages Free）
+- **月額コスト目安**: $0-30
+- **重点**: PMF検証を優先、過剰最適化を避ける
 - **やること**:
-  - 基本的な監視（Vercel Analytics, Supabase Dashboard）
-  - エラートラッキング（Sentry Free）
+  - 基本監視（Sentry + provider Analytics）
   - 手動パフォーマンスチェック
-- **やらないこと**: 早すぎる最適化、有料プランへの移行
+  - ボトルネック計測の基準線作成
 
 #### Stage 2: 100-1,000ユーザー（Product-Market Fit）
-- **インフラ**: Supabase Pro ($25/月), Vercel Pro ($20/月)
-- **月額コスト目安**: $50-100
-- **重点**: パフォーマンス基盤整備、コネクションプーリング有効化
+- **インフラ**: Supabase Pro + provider有料プラン（必要時）
+- **月額コスト目安**: $50-150
+- **重点**: DB接続とレスポンス安定化
 - **やること**:
   - Supabase PgBouncer（コネクションプーリング）有効化
-  - データベースインデックス最適化
-  - 画像最適化（Next.js Image + CDN）
-  - API レスポンスキャッシュ導入
-  - バックアップ戦略策定
+  - インデックス最適化
+  - APIレスポンスキャッシュ導入
+  - バックアップ/復旧手順の明文化
 - **スケーリングトリガー**: p95レスポンス > 3秒、DB接続数 > 50%
 
 #### Stage 3: 1,000-10,000ユーザー（Growth）
-- **インフラ**: Supabase Pro/Team, Vercel Pro, CDN最適化
-- **月額コスト目安**: $100-500
-- **重点**: パフォーマンス最適化、Edge活用、非同期処理
+- **インフラ**: Supabase Pro/Team + provider最適化
+- **月額コスト目安**: $150-700
+- **重点**: CDN/Edge活用と非同期化
 - **やること**:
-  - Vercel Edge Functions活用（地理的に近いリージョンで実行）
-  - ISR/SSG活用でサーバー負荷軽減
-  - Supabase Edge Functions（計算処理のオフロード）
-  - データベースパーティショニング検討
-  - キュー/バックグラウンドジョブ導入（Inngest/Trigger.dev等）
+  - providerのEdge実行基盤を活用（Vercel Edge Functions / Cloudflare Workers）
+  - ISR/SSGやキャッシュ戦略でサーバー負荷軽減
+  - 非同期ジョブ導入（Inngest / Trigger.dev / Queues）
   - Rate Limiting実装
   - Read Replica検討
 - **スケーリングトリガー**: p95レスポンス > 2秒、DB CPU > 70%、月間リクエスト > 1M
 
 #### Stage 4: 10,000+ユーザー（Scale）
-- **インフラ**: Supabase Team/Enterprise, Vercel Enterprise検討
-- **月額コスト目安**: $500+
-- **重点**: マルチリージョン、専用インフラ、SLA保証
+- **インフラ**: Supabase Team/Enterprise + provider上位プラン/専用構成
+- **月額コスト目安**: $700+
+- **重点**: SLA・マルチリージョン・運用自動化
 - **やること**:
-  - マルチリージョンデプロイ検討
-  - 専用データベースインスタンス
-  - Redis/Upstash導入（セッション、キャッシュ）
-  - CDNエッジキャッシュ最適化
-  - 専用インフラ移行判断（AWS/GCP直接利用 vs PaaS継続）
-  - SLA定義と監視
-- **判断ポイント**: PaaSのコスト効率 vs 専用インフラの制御性
+  - マルチリージョン配信の検討
+  - 高負荷ワークロード分離（読み取り/書き込み、同期/非同期）
+  - キャッシュ階層の再設計
+  - 専用インフラ移行判断（PaaS継続 vs AWS/GCP直利用）
 
-### Step 3: Supabase コネクションプーリング設定
+### Step 3: provider別の最適化観点
+
+| 領域 | vercel | cloudflare-pages |
+|------|--------|-------------------|
+| エッジ実行 | Edge Functions / ISR | Pages Functions / Workers |
+| CDNキャッシュ | Vercel Edge Network | Cloudflare CDN / Cache Rules |
+| ログ/分析 | Vercel Analytics + Logs | Cloudflare Analytics + Logs |
+| デプロイ運用 | Immutable Deploy + Rollback | Pages Deploy + Previous Deployment への復帰 |
+
+### Step 4: Supabase コネクションプーリング設定
 
 PgBouncer（Supabase組み込み）の設定ガイドを作成する:
 
-- **Transaction Mode**（推奨）: リクエストごとに接続を再利用
+- **Transaction Mode**（推奨）
   - 接続文字列の切り替え方法（ポート6543）
   - Prisma/Drizzle等のORM設定変更手順
   - Prepared Statementsの制限事項
-- **Session Mode**: 長時間接続が必要な場合
+- **Session Mode**（長時間接続が必要な場合）
 - **接続数の見積もり方法**:
-  - Vercel Serverless: 同時実行数 × リージョン数
+  - provider Functions の同時実行数 × リージョン数
   - 推奨プールサイズ計算式
 - **モニタリング**: アクティブ接続数の監視方法
 
-### Step 4: キャッシュ戦略
+### Step 5: キャッシュ戦略
 
 4層のキャッシュ戦略を定義する:
 
@@ -108,93 +125,61 @@ PgBouncer（Supabase組み込み）の設定ガイドを作成する:
 - APIレスポンス: `private, max-age=0, must-revalidate`
 - SWR（stale-while-revalidate）パターン
 
-#### Layer 2: CDNキャッシュ（Vercel Edge Network）
+#### Layer 2: CDNキャッシュ（provider Edge Network）
 - ISR（Incremental Static Regeneration）設定
-  - revalidate間隔の設計指針
-  - On-Demand Revalidation（Webhook連動）
-- SSG（Static Site Generation）対象ページの選定基準
-- Edge Cacheのpurge戦略
+- SSG（Static Site Generation）対象ページ選定
+- Edge Cache purge戦略
 
 #### Layer 3: アプリケーションキャッシュ
 - React Query / SWR のキャッシュ設定
-  - staleTime, cacheTime の推奨値
-  - Optimistic Updates パターン
-- Server-side メモリキャッシュ（unstable_cache / next/cache）
+- Server-side メモリキャッシュ（`unstable_cache` / `next/cache`）
 - APIルートのレスポンスキャッシュ
 
-#### Layer 4: 外部キャッシュ（Growth段階以降）
-- Upstash Redis: セッション、頻繁に参照するデータ
-- KV Store（Vercel KV）: 設定値、フィーチャーフラグ
-- 導入判断基準: DB負荷が70%超 or p95レスポンス > 2秒
+#### Layer 4: 外部キャッシュ（Growth以降）
+- Upstash Redis: セッション、頻出データ
+- provider系KV（Cloudflare KV等）: フラグ・設定値
+- 導入判断: DB負荷が70%超 or p95レスポンス > 2秒
 
-### Step 5: パフォーマンスバジェット定義
+### Step 6: パフォーマンスバジェット定義
 
-Core Web Vitals ベースのパフォーマンスバジェットを設定する:
+Core Web Vitals ベースのバジェットを設定する:
 
 | メトリクス | 目標値 | 警告値 | 測定方法 |
 |-----------|--------|--------|---------|
-| FCP (First Contentful Paint) | < 1.8s | > 2.5s | Lighthouse / Web Vitals |
-| LCP (Largest Contentful Paint) | < 2.5s | > 3.5s | Lighthouse / Web Vitals |
-| INP (Interaction to Next Paint) | < 200ms | > 300ms | Web Vitals |
-| CLS (Cumulative Layout Shift) | < 0.1 | > 0.15 | Lighthouse / Web Vitals |
-| TTFB (Time to First Byte) | < 800ms | > 1.2s | Vercel Analytics |
-| バンドルサイズ (JS) | < 200KB | > 300KB | next/bundle-analyzer |
+| FCP | < 1.8s | > 2.5s | Lighthouse / Web Vitals |
+| LCP | < 2.5s | > 3.5s | Lighthouse / Web Vitals |
+| INP | < 200ms | > 300ms | Web Vitals |
+| CLS | < 0.1 | > 0.15 | Lighthouse / Web Vitals |
+| TTFB | < 800ms | > 1.2s | provider Analytics / RUM |
+| バンドルサイズ(JS) | < 200KB | > 300KB | bundle-analyzer |
 
-パフォーマンスバジェットの運用方法:
-- CI/CDでのLighthouseチェック自動化
-- バジェット超過時のアラート設定
-- 週次パフォーマンスレビュー手順
+運用:
+- CI/CDでLighthouseチェック自動化
+- バジェット超過時のアラート
+- 週次パフォーマンスレビュー
 
-### Step 6: データベーススケーリング
+### Step 7: データベーススケーリング
 
-段階的なデータベース最適化戦略を策定する:
+段階的なDB最適化戦略を策定する:
 
-#### インデックス最適化
-- 頻出クエリパターンの特定方法（pg_stat_statements）
-- 複合インデックスの設計指針
-- 不要インデックスの検出と削除
-- EXPLAIN ANALYZEの読み方と活用
+- インデックス最適化（`pg_stat_statements`、`EXPLAIN ANALYZE`）
+- スロークエリ特定とN+1解消
+- 10K+段階でのパーティショニング検討
+- Growth段階でのRead Replica導入検討
 
-#### クエリプロファイリング
-- Supabase Dashboard での確認方法
-- スロークエリの特定と改善
-- N+1問題の検出と解決
-- クエリプラン最適化のパターン
-
-#### パーティショニング（10K+ユーザー段階）
-- テーブルパーティショニングの判断基準
-- 時系列データのRange Partitioning
-- テナント別のList Partitioning
-- パーティション管理の自動化
-
-#### Read Replica（Growth段階以降）
-- Supabase Read Replicaの設定
-- 読み取り/書き込みの分離パターン
-- レプリケーションラグの許容範囲設計
-
-### Step 7: 非同期処理パターン
+### Step 8: 非同期処理パターン
 
 スケーラブルな非同期処理の導入計画を作成する:
 
-#### キュー/バックグラウンドジョブ
-- **Inngest**: イベント駆動のバックグラウンドジョブ（Vercel統合）
-  - ユースケース: メール送信、Webhook処理、データ集計
-  - リトライ戦略、タイムアウト設定
-- **Trigger.dev**: 長時間実行タスク（Vercel Serverless制限の回避）
-  - ユースケース: レポート生成、大量データ処理
-- **Supabase Edge Functions + pg_cron**: スケジュールジョブ
-  - ユースケース: 定期クリーンアップ、統計計算
+- **Inngest**: イベント駆動ジョブ（メール、Webhook、集計）
+- **Trigger.dev**: 長時間処理（レポート生成など）
+- **Supabase Edge Functions + pg_cron**: 定期ジョブ
+- **Cloudflare Queues（cloudflare-pages時）**: provider内ジョブ連携
 
-#### 非同期処理パターン
-- Fire-and-Forget: 結果を待たない処理（ログ記録、通知）
-- Request-Response with Queue: 重い処理の非同期化
-- Event Sourcing: 変更イベントの記録と再生
-- Saga Pattern: 複数サービスにまたがるトランザクション
-
-#### 導入判断基準
-- APIレスポンスタイム > 3秒の処理
-- Vercel Serverless タイムアウト（10秒/60秒）に近い処理
-- ユーザー体験に直接影響しない処理
+導入判断基準:
+- APIレスポンス > 3秒の処理
+- provider Functions のタイムアウト上限に近い処理
+- ユーザー体験に非同期化可能な処理
 
 ## 出力ファイル
 
@@ -203,10 +188,11 @@ Core Web Vitals ベースのパフォーマンスバジェットを設定する:
 ## 品質チェック
 
 - [ ] 各マイルストーン（0-100, 100-1K, 1K-10K, 10K+）のコスト目安が記載されているか
+- [ ] `deployment_provider` に応じた運用制約が明記されているか
 - [ ] ボトルネック特定方法（メトリクス、ツール、閾値）が明確か
 - [ ] コネクションプーリングの設定手順が具体的か
 - [ ] キャッシュ戦略が4層（ブラウザ、CDN、アプリ、外部）で整理されているか
 - [ ] パフォーマンスバジェットがCore Web Vitalsに準拠しているか
 - [ ] データベース最適化の段階が成長フェーズに対応しているか
 - [ ] 非同期処理の導入判断基準が明確か
-- [ ] 各段階のスケーリングトリガー（いつ次の段階に移るか）が定義されているか
+- [ ] 各段階のスケーリングトリガーが定義されているか

@@ -40,14 +40,20 @@ allowed-tools:
     「どのようにユーザーに最初の100人にリーチしますか？」
     （例: SNS投稿 / SEO / Product Hunt / 友人・知人 / コミュニティ / 広告）
 
-12. **コスト試算**（重要）:
-    「月間100ユーザーになったとき、インフラコストはいくらになりますか？
-     Vercel Hobby は商用利用不可（Pro: $20/月）、
-     Supabase Free は 7日非アクティブで一時停止します。
-     スケール時の費用感を確認しておきましょう。」
+12. **デプロイ先候補の確認**（必須）:
+    「初期リリースのデプロイ先を `vercel` / `cloudflare-pages` のどちらで想定しますか？
+     未決定なら、Phase 2 で必ず確定する前提にします。」
 
-13. **Vercel制限告知**（必須）: 「Vercel Hobby プランはcommercial useに利用できません。商用利用の場合はPro($20/月)が必要です。問題ありませんか？」
-14. **Supabase制限告知**（必須）: 「Supabase Freeプランは500MB/2プロジェクト/7日非アクティブで一時停止の制限があります。問題ありませんか？」
+13. **コスト試算**（重要）:
+    「月間100ユーザー時のインフラコストはいくらになりますか？
+     選ぶ deployment provider（vercel / cloudflare-pages）の無料枠・商用利用条件、
+     Supabase プラン制約を前提に試算しておきましょう。」
+
+14. **Provider制約確認**（必須）:
+    「選択予定の provider の制約（無料枠・Functions上限・ログ保持・商用利用可否）を確認済みですか？」
+
+15. **Supabase制約確認**（必須）:
+    「Supabase Free/Pro の制約（容量・プロジェクト数・休眠挙動）を確認済みですか？」
 
 既にアイデアに情報が含まれている場合は、確認のみ行います。
 
@@ -55,6 +61,7 @@ allowed-tools:
 
 `docs/requirements.md` を `references/requirements-template.md` を元に生成します。
 `references/evaluation-criteria.md` の5軸基準でヒアリング結果を評価し、requirements.md 内の「アイデア評価（5軸）」セクションに記載する。
+あわせて `deployment_provider` の候補と、採用時の制約認識（コスト/運用）を requirements.md に明記する。
 
 ### Step 3: ドメイン候補確認
 
@@ -141,6 +148,8 @@ OMTM: [指標名]
 - [ ] 「このサービスを使ってほしい人を3人実名で挙げられているか」
 - [ ] チャネル戦略が記載されているか
 - [ ] スケール時のコスト試算が含まれているか
+- [ ] deployment provider の候補または確定値（`vercel` / `cloudflare-pages`）が明記されているか
+- [ ] provider / Supabase の主要制約と回避方針が記載されているか
 - [ ] ユーザーストーリーマップで MVP スコープが可視化されているか
 - [ ] 非機能要件が定義されているか
 - [ ] リスクレジスタにスコア15以上のリスクが対策付きで記載されているか

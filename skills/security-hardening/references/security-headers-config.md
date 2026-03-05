@@ -7,6 +7,10 @@
 ```javascript
 // next.config.js
 /** @type {import('next').NextConfig} */
+const CONNECT_SRC_HOSTS = process.env.NEXT_PUBLIC_DEPLOYMENT_PROVIDER === 'cloudflare-pages'
+  ? "https://*.supabase.co https://*.sentry.io wss://*.supabase.co https://static.cloudflareinsights.com"
+  : "https://*.supabase.co https://*.sentry.io wss://*.supabase.co https://va.vercel-scripts.com"
+
 const nextConfig = {
   async headers() {
     return [
@@ -21,7 +25,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self'",
-              "connect-src 'self' https://*.supabase.co https://*.sentry.io wss://*.supabase.co",
+              `connect-src 'self' ${CONNECT_SRC_HOSTS}`,
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
@@ -68,13 +72,17 @@ export function middleware(request: NextRequest) {
 
   // CSP（ノンスを使う場合）
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const connectSrcHosts = request.headers.get('x-deployment-provider') === 'cloudflare-pages'
+    ? "https://*.supabase.co https://*.sentry.io wss://*.supabase.co https://static.cloudflareinsights.com"
+    : "https://*.supabase.co https://*.sentry.io wss://*.supabase.co https://va.vercel-scripts.com"
+
   const csp = [
     `default-src 'self'`,
     `script-src 'self' 'nonce-${nonce}' https://va.vercel-scripts.com`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: https:`,
     `font-src 'self'`,
-    `connect-src 'self' https://*.supabase.co https://*.sentry.io wss://*.supabase.co`,
+    `connect-src 'self' ${connectSrcHosts}`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,
@@ -106,7 +114,7 @@ XSS やデータインジェクション攻撃を防止する。
 | `script-src` | JavaScript | `'self'` + 必要な外部スクリプト |
 | `style-src` | CSS | `'self' 'unsafe-inline'`（Tailwind 用） |
 | `img-src` | 画像 | `'self' data: https:` |
-| `connect-src` | API/WebSocket | `'self'` + Supabase/Sentry |
+| `connect-src` | API/WebSocket | `'self'` + provider別ホスト（Supabase/Sentry + Analytics） |
 | `frame-ancestors` | iframe 埋め込み制御 | `'none'` |
 | `base-uri` | `<base>` タグ制御 | `'self'` |
 | `form-action` | フォーム送信先 | `'self'` |

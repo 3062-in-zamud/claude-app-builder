@@ -2,12 +2,12 @@
 
 ## 選択肢比較
 
-| | Vercel Edge Config | PostHog | 自前実装 |
-|--|-------------------|---------|---------|
-| 費用 | Vercel Pro必要($20/月) | 無料〜(1M events/月) | 無料 |
-| 速度 | Edge(超高速) | API呼び出し | DB依存 |
-| 統計 | なし | 内蔵 | なし |
-| 推奨 | Vercel Pro利用者 | 無料で始めたい | 最小構成 |
+| | Provider Native（Vercel/Cloudflare） | PostHog | 自前実装 |
+|--|-------------------------------------|---------|---------|
+| 費用 | providerプラン依存 | 無料〜(1M events/月) | 無料 |
+| 速度 | Edge(低レイテンシ) | API呼び出し | DB依存 |
+| 統計 | ツール依存 | 内蔵 | なし |
+| 推奨 | provider統合を重視する場合 | 無料で始めたい | 最小構成 |
 
 ## useExperiment Hook
 

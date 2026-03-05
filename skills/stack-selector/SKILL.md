@@ -12,6 +12,11 @@ allowed-tools:
 
 # stack-selector: 技術スタック選定
 
+## 目的
+
+このスキルの出力は後続スキルの唯一の入力契約になる。
+`docs/tech-stack.md` の形式は固定し、曖昧な表現や省略を禁止する。
+
 ## ワークフロー
 
 ### Step 1: アプリタイプ判定
@@ -20,7 +25,7 @@ allowed-tools:
 
 | タイプ | 条件 | テンプレート |
 |--------|------|------------|
-| `web-fullstack` | 認証あり・DB あり | Next.js + Supabase + Vercel |
+| `web-fullstack` | 認証あり・DB あり | Next.js + Supabase + (Vercel or Cloudflare Pages) |
 | `web-api` | APIのみ・フロントなし | Hono + Cloudflare Workers |
 | `cli` | コマンドラインツール | Node.js CLI（Commander.js） |
 | `tui` | ターミナルUI | Ink（React for CLI） |
@@ -28,14 +33,9 @@ allowed-tools:
 
 **モバイルアプリ（React Native / Expo）**:
 - React Native + Expo
-- 注意: `/app-builder` フルフローは現在 Web アプリのみ対応です
-  モバイルを選択した場合は各フェーズのスキルを手動実行してください
+- 注意: `/app-builder` フルフローは現在 Web アプリのみ対応
 
-⚠️ モバイルアプリを選択した場合:
-「`/app-builder` は現在 Web アプリのみ自動化対応です。
-各フェーズのスキルを手動で実行してください。」
-
-### Step 2: デフォルトスタック（web-fullstack）
+### Step 2: web-fullstack のデフォルトスタック
 
 ```
 フロントエンド: Next.js 15 (App Router) + TypeScript
@@ -43,34 +43,58 @@ UI: Tailwind CSS + shadcn/ui
 バックエンド: Next.js API Routes / Server Actions
 データベース: Supabase (PostgreSQL + Row Level Security)
 認証: Supabase Auth
-デプロイ: Vercel
+デプロイ: deployment_provider で選択（vercel / cloudflare-pages）
 テスト: Vitest + Playwright
 型チェック: TypeScript strict mode
 リント: ESLint + Prettier
 ```
 
-### Step 3: tech-stack.md 生成
+### Step 3: deployment_provider を決定（web-fullstack 必須）
 
-### 出力ファイル
+- `deployment_provider: vercel`
+- `deployment_provider: cloudflare-pages`
 
-- `docs/tech-stack.md`
+第1弾の制約:
+- `cloudflare-pages` を選んでも DB/Auth は Supabase 維持
+- D1/KV/R2 置換は対象外
+
+### Step 4: tech-stack.md を契約形式で生成
+
+出力ファイル: `docs/tech-stack.md`
+
+以下のキーを **行頭の `key: value` 形式で必ず出力**（箇条書き禁止）:
+
+```markdown
+# Tech Stack
+
+app_type: web-fullstack
+deployment_provider: vercel
+app_domain: app.example.com
+
+# Cloudflare 選択時のみ必須
+cloudflare_pages_project: your-pages-project
+cloudflare_build_command: npm run build:cloudflare
+cloudflare_build_dir: .open-next/cloudflare
+```
+
+補足:
+- `deployment_provider=vercel` の場合、`cloudflare_*` は空でも可
+- `deployment_provider=cloudflare-pages` の場合、`cloudflare_*` は全て必須
 
 ## ADR（Architecture Decision Record）
 
-技術選定の各判断を ADR として記録する。`references/adr-template.md` を使用。
+`references/adr-template.md` を使い、主要判断を記録:
 
 ```
 docs/adr/
 ├── 0001-use-nextjs-app-router.md
 ├── 0002-use-supabase-for-database.md
-└── 0003-use-vercel-for-deployment.md
+└── 0003-use-{deployment-provider}-for-deployment.md
 ```
-
-主要な技術選定（フレームワーク、DB、認証、デプロイ先）ごとに ADR を1件作成する。
 
 ## 技術選定スコアリングマトリクス
 
-技術候補を6軸で定量評価する:
+6軸で候補を評価:
 
 | 軸 | 重み | 説明 |
 |----|------|------|
@@ -81,34 +105,13 @@ docs/adr/
 | コミュニティ | 10% | ドキュメント・エコシステムの充実度 |
 | メンテナンス性 | 10% | 長期運用の容易さ |
 
-```markdown
-### 技術選定スコアリング（例: フロントエンド）
+## 品質チェック
 
-| 候補 | 開発速度(25) | スケール(20) | コスト(20) | 学習(15) | コミュニティ(10) | 保守(10) | 合計 |
-|------|------------|------------|----------|---------|---------------|---------|------|
-| Next.js | 23 | 18 | 18 | 12 | 9 | 9 | 89 |
-| Remix | 20 | 17 | 18 | 10 | 7 | 8 | 80 |
-| Nuxt.js | 21 | 16 | 18 | 11 | 7 | 8 | 81 |
-```
-
-## ユーザー数別コスト予測
-
-`references/cost-estimation-template.md` に従い、スケール時のインフラコストを予測する:
-
-| ユーザー数 | Vercel | Supabase | その他 | 月額合計 |
-|-----------|--------|----------|--------|---------|
-| 〜100 | $0 (Hobby) | $0 (Free) | - | $0 |
-| 〜1,000 | $20 (Pro) | $25 (Pro) | - | $45 |
-| 〜10,000 | $20 + 従量 | $25 + 従量 | Sentry $29 | ~$100 |
-| 〜100,000 | Enterprise | Team $599 | + CDN | ~$800+ |
-
-tech-stack.md に「コスト予測」セクションとして記載する。
-
-### 品質チェック
-
-- [ ] アプリタイプが明確に判定されているか
-- [ ] 選定理由が記載されているか
-- [ ] 必要な npm パッケージが列挙されているか
-- [ ] 主要技術選定ごとに ADR が作成されているか
-- [ ] 技術選定スコアリングマトリクスが含まれているか
-- [ ] ユーザー数別コスト予測が tech-stack.md に含まれているか
+- [ ] `docs/tech-stack.md` が作成されているか
+- [ ] `app_type` が行頭 `key: value` 形式で定義されているか
+- [ ] `deployment_provider` が `vercel` か `cloudflare-pages` のどちらかか
+- [ ] `app_domain` が定義されているか
+- [ ] `deployment_provider=cloudflare-pages` の場合 `cloudflare_pages_project` があるか
+- [ ] `deployment_provider=cloudflare-pages` の場合 `cloudflare_build_command` があるか
+- [ ] `deployment_provider=cloudflare-pages` の場合 `cloudflare_build_dir` があるか
+- [ ] ADR が `0001`〜`0003` まで作成されているか

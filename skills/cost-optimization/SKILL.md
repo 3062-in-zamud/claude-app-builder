@@ -29,7 +29,7 @@ allowed-tools:
 - `docs/architecture.md`
 - `docs/deploy-setup.md`
 
-存在しないファイルはスキップし、一般的なVercel + Supabaseスタックを前提に進める。
+存在しないファイルはスキップし、一般的な `deployment_provider + Supabase` 構成を前提に進める。
 
 ### Step 2: インフラコスト棚卸し
 
@@ -39,7 +39,7 @@ allowed-tools:
 
 | カテゴリ | サービス | プラン | 月額 | 年額 | 用途 | 必須度 |
 |---------|---------|-------|------|------|------|-------|
-| ホスティング | Vercel | Hobby/Pro | $0-20 | $0-240 | フロントエンド・API | 必須 |
+| ホスティング | Deployment Provider（Vercel / Cloudflare Pages） | Free/Hobby/Pro | $0-20+ | $0-240+ | フロントエンド・API | 必須 |
 | データベース | Supabase | Free/Pro | $0-25 | $0-300 | DB・Auth・Storage | 必須 |
 | 決済 | Stripe | 従量課金 | 変動 | 変動 | 決済処理 | 必須 |
 | エラー監視 | Sentry | Free/Team | $0-26 | $0-312 | エラートラッキング | 推奨 |
@@ -73,8 +73,8 @@ Gross Margin = ($500 - $100) / $500 × 100 = 80% ✅ 健全
 | MRR | インフラ上限（30%） | 推奨構成 |
 |-----|-------------------|---------|
 | $0 (プレローンチ) | $0-20 | 全サービスFree tier |
-| $100 | $30 | Supabase Pro + Vercel Hobby |
-| $500 | $150 | Supabase Pro + Vercel Pro |
+| $100 | $30 | Supabase Pro + provider Free/Hobby |
+| $500 | $150 | Supabase Pro + provider有料プラン |
 | $1,000 | $300 | + Sentry Team + Redis |
 | $5,000 | $1,500 | + 専用DB + CDN最適化 |
 | $10,000+ | $3,000 | マルチリージョン検討 |

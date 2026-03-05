@@ -10,7 +10,7 @@ MVP でも考慮すべき非機能要件を4カテゴリに整理する。
 | 要件 | MVP基準 | 将来基準 | 測定方法 |
 |------|---------|---------|---------|
 | 初回ページ読み込み（LCP） | < 3.0秒 | < 1.5秒 | Lighthouse |
-| API レスポンス時間（p95） | < 500ms | < 200ms | Sentry / Vercel Analytics |
+| API レスポンス時間（p95） | < 500ms | < 200ms | Sentry / provider Analytics |
 | Time to Interactive（TTI） | < 5.0秒 | < 3.0秒 | Lighthouse |
 | First Input Delay（FID） | < 300ms | < 100ms | Core Web Vitals |
 | Cumulative Layout Shift（CLS） | < 0.25 | < 0.1 | Core Web Vitals |
@@ -23,14 +23,14 @@ MVP でも考慮すべき非機能要件を4カテゴリに整理する。
 | 要件 | MVP基準 | 将来基準 | 確認方法 |
 |------|---------|---------|---------|
 | 認証方式 | Supabase Auth（メール/パスワード） | + OAuth + MFA | 手動テスト |
-| データ暗号化（通信） | HTTPS（Vercel 標準） | + Certificate Pinning | 自動 |
+| データ暗号化（通信） | HTTPS（deployment provider 標準） | + Certificate Pinning | 自動 |
 | データ暗号化（保管） | Supabase 標準暗号化 | + フィールドレベル暗号化 | 設定確認 |
 | アクセス制御 | RLS（Row Level Security） | + ABAC | security-hardening |
 | 入力バリデーション | Zod でサーバーサイド検証 | + Rate Limiting | コードレビュー |
 | CSRF 対策 | SameSite Cookie | + CSRF Token | security-hardening |
 | XSS 対策 | React デフォルトエスケープ | + CSP ヘッダー | security-hardening |
 | 依存関係の脆弱性 | npm audit（HIGH以上なし） | + Snyk 統合 | CI |
-| シークレット管理 | .env + Vercel 環境変数 | + Secret Manager | 手動確認 |
+| シークレット管理 | .env + provider 環境変数 | + Secret Manager | 手動確認 |
 
 ## 3. 可用性（Availability）
 
@@ -51,9 +51,9 @@ MVP でも考慮すべき非機能要件を4カテゴリに整理する。
 | 同時接続数 | 100 | 10,000 | 負荷テスト |
 | データ量 | 〜10GB | 〜1TB | Supabase Dashboard |
 | API レートリミット | 100 req/min/user | カスタム | ミドルウェア |
-| CDN | Vercel Edge Network | + 画像CDN | 自動 |
+| CDN | provider Edge Network | + 画像CDN | 自動 |
 | DB コネクションプーリング | Supabase 標準 | + PgBouncer | 設定確認 |
-| 水平スケーリング | Vercel Serverless（自動） | + Edge Functions | 自動 |
+| 水平スケーリング | provider Functions（自動） | + Edge Functions | 自動 |
 | キャッシュ戦略 | ISR（Incremental Static Regeneration） | + Redis | next.config 確認 |
 
 ## 優先度マトリクス
