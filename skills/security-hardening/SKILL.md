@@ -177,7 +177,7 @@ npm audit --audit-level=high
 
 HIGH 以上の脆弱性がある場合は `npm audit fix` または手動対応。
 
-### Step 5: チェック結果レポート出力
+### Step 8: チェック結果レポート出力
 
 ```
 🔐 セキュリティチェック結果

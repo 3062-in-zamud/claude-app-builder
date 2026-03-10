@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude App Builder v3.1 - 更新スクリプト
+# Claude App Builder v0.1 - 更新スクリプト
 
 set -euo pipefail
 shopt -s nullglob
@@ -60,6 +60,6 @@ done
 sort -u -o "$CMD_MANIFEST" "$CMD_MANIFEST"
 
 echo ""
-echo "✅ Claude App Builder v3.1 更新完了！"
+echo "✅ Claude App Builder v0.1 更新完了！"
 echo "   スキル数: $(wc -l < "$SKILL_MANIFEST" | tr -d ' ') 個"
 echo "   コマンド数: $(wc -l < "$CMD_MANIFEST" | tr -d ' ') 個"

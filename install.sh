@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude App Builder v3.1 - インストールスクリプト
+# Claude App Builder v0.1 - インストールスクリプト
 # Usage: curl -fsSL https://raw.githubusercontent.com/3062-in-zamud/claude-app-builder/main/install.sh | bash
 # または: bash install.sh
 
@@ -17,7 +17,7 @@ REPO_URL="https://github.com/3062-in-zamud/claude-app-builder"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 
-echo "🚀 Claude App Builder v3.1 インストール開始"
+echo "🚀 Claude App Builder v0.1 インストール開始"
 echo ""
 
 # ===== 1. 前提ツール確認 =====
@@ -109,7 +109,7 @@ fi
 
 echo ""
 echo "═══════════════════════════════════"
-echo "✅ Claude App Builder v3.1 インストール完了！"
+echo "✅ Claude App Builder v0.1 インストール完了！"
 echo ""
 echo "使い方:"
 echo "  /app-builder \"あなたのアイデア\"  - 0→MVPリリース（Stage A〜C）"
