@@ -1,9 +1,9 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "claude-app-builder",
-  "description": "Zero to MVP in one command. 36 skills for full-stack app automation.",
+  "description": "Zero to MVP in one command. 35 skills for full-stack app automation.",
   "metadata": {
-    "description": "Zero to MVP in one command. 36 skills for full-stack app automation."
+    "description": "Zero to MVP in one command. 35 skills for full-stack app automation."
   },
   "owner": {
     "name": "3062-in-zamud",
@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "claude-app-builder",
-      "description": "Zero to MVP in one command. Orchestrates 36 skills across 8 phases — spec, branding, stack selection, scaffolding, TDD implementation, AI-specific security hardening, monitoring, and Vercel+Supabase deployment.",
+      "description": "Zero to MVP in one command. Orchestrates 35 skills across 8 phases — spec, branding, stack selection, scaffolding, TDD implementation, AI-specific security hardening, monitoring, and Vercel+Supabase deployment.",
       "version": "0.1.0",
       "author": { "name": "3062-in-zamud" },
       "source": "./",
